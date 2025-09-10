@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laam wallet</title>
+    <!-- Favicon & OG Image -->
+    <link rel="icon" type="image/png" href="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+    <meta property="og:image" content="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+    <meta property="og:title" content="Laam wallet - Modern Digital Currency">
+    <meta property="og:description" content="Laam Token is a digital asset built on Stellar with a fixed supply.">
+    <meta property="og:url" content="https://laam.online">
+    <meta property="og:type" content="website">
+<!-- Android PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1976d2">
+
+<!-- iPhone / iPad PWA -->
+<link rel="apple-touch-icon" href="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Laam Wallet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/10.4.0/stellar-sdk.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<!-- Add Chart.js for beautiful charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root{
+    /* Blue & White Theme */
+    --bg1:#eef2f3; --bg2:#8e9eab;
+    --card:rgba(255, 255, 255, 0.9);
+    --text:#0a192f; --muted:#546e7a;
+    --brand:#0052cc; --brand2:#0041a3; --line:#d0d8e0;
+    --ok:#28a745; --warn:#ffc107; --err:#dc3545;
+    --maxw: 920px; --rad:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    background:linear-gradient(135deg,#b8c6db,#f5f7fa);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 14px;
+  }
+  .app{ width:100%; max-width:450px; text-align:center; }
+  
+  /* Logo and Header Styles */
+  .logo-container{ 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    gap:15px; 
+    margin-bottom:40px; 
+  }
+  .logo-container img{ 
+    width:80px; 
+    height:80px; 
+    border-radius:50%;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  }
+  h1{ 
+    margin:0; 
+    font-size:3rem; 
+    font-weight:800; 
+    color:#1976d2; 
+    text-shadow:1px 1px 2px rgba(0,0,0,0.1); 
+  }
+  
+  /* Import Card Styles */
+  .import-card{
+    background:rgba(255, 255, 255, 0.95);
+    border:none;
+    border-radius:24px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.12);
+    padding:40px 30px;
+    margin:0 auto;
+    backdrop-filter:blur(10px);
+    max-width:100%;
+  }
+  
+  .form-group{
+    margin-bottom:24px;
+    text-align:left;
+  }
+  
+  .form-label{
+    display:block;
+    font-size:18px;
+    font-weight:700;
+    color:#1976d2;
+    margin-bottom:12px;
+  }
+  
+  .form-input{
+    width:100%;
+    padding:20px;
+    border:2px solid #e0e0e0;
+    border-radius:16px;
+    font-size:16px;
+    background:#f8f9fa;
+    color:#333;
+    outline:none;
+    transition:all 0.3s ease;
+    font-family:'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  }
+  
+  .form-input:focus{
+    border-color:#1976d2;
+    background:white;
+    box-shadow:0 0 0 4px rgba(25,118,210,0.1);
+  }
+  
+  .form-input::placeholder{
+    color:#bbb;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  
+  .import-button{
+    width:100%;
+    padding:20px;
+    background:#1976d2;
+    color:white;
+    border:none;
+    border-radius:16px;
+    font-size:18px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    box-shadow:0 4px 16px rgba(25,118,210,0.3);
+    margin-top:16px;
+  }
+  
+  .import-button:hover{
+    background:#1565c0;
+    box-shadow:0 6px 20px rgba(25,118,210,0.4);
+    transform:translateY(-2px);
+  }
+  
+  .import-button:disabled{
+    background:#b0bec5;
+    cursor:not-allowed;
+    box-shadow:none;
+    transform:none;
+  }
+  
+  .divider{
+    margin:32px 0;
+    text-align:center;
+    position:relative;
+  }
+  
+  .divider::before{
+    content:'';
+    position:absolute;
+    top:50%;
+    left:0;
+    right:0;
+    height:1px;
+    background:#e0e0e0;
+  }
+  
+  .divider-text{
+    background:rgba(255, 255, 255, 0.95);
+    padding:0 16px;
+    color:#666;
+    font-size:14px;
+    font-weight:500;
+  }
+  
+  .generate-link{
+    text-align:center;
+  }
+  
+  .generate-button{
+    color:#1976d2;
+    text-decoration:underline;
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    transition:color 0.3s ease;
+    text-transform:none;
+    padding:0;
+    width:auto;
+    box-shadow:none;
+  }
+  
+  .generate-button:hover{
+    color:#1565c0;
+    transform:none;
+    box-shadow:none;
+  }
+  
+  .note-text{
+    font-size:12px;
+    color:#666;
+    margin-top:8px;
+    line-height:1.4;
+  }
+
+  /* Key Display Modal */
+  .key-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+  }
+  .key-modal.show{
+    display:flex;
+  }
+  .key-modal-content{
+    background:rgba(255, 255, 255, 0.95);
+    border:none;
+    border-radius:24px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.12);
+    padding:40px 30px;
+    max-width:500px;
+    width:90%;
+    max-height:90vh;
+    overflow-y:auto;
+    backdrop-filter:blur(10px);
+  }
+  .key-modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+  }
+  .key-modal-title{
+    font-size:1.8rem;
+    font-weight:700;
+    color:#1976d2;
+    margin:0;
+  }
+  .key-modal-close{
+    background:none;
+    border:none;
+    font-size:2rem;
+    cursor:pointer;
+    color:#666;
+    padding:0;
+    width:auto;
+    height:auto;
+    box-shadow:none;
+    text-transform:none;
+  }
+  .key-modal-close:hover{
+    color:#333;
+    transform:none;
+    box-shadow:none;
+  }
+  .key-display-group{
+    margin-bottom:30px;
+  }
+  .key-display-label{
+    display:block;
+    font-size:16px;
+    font-weight:700;
+    color:#1976d2;
+    margin-bottom:12px;
+  }
+  .key-display-container{
+    position:relative;
+    display:flex;
+    align-items:center;
+  }
+  .key-display-input{
+    width:100%;
+    padding:15px 60px 15px 15px;
+    border:2px solid #e0e0e0;
+    border-radius:12px;
+    font-size:14px;
+    background:#f8f9fa;
+    color:#333;
+    font-family:'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    word-break:break-all;
+    resize:none;
+  }
+  .copy-btn{
+    position:absolute;
+    right:10px;
+    background:#1976d2;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    text-transform:uppercase;
+    box-shadow:0 2px 8px rgba(25,118,210,0.3);
+  }
+  .copy-btn:hover{
+    background:#1565c0;
+    box-shadow:0 4px 12px rgba(25,118,210,0.4);
+    transform:translateY(-1px);
+  }
+  .copy-btn.copied{
+    background:#28a745;
+    box-shadow:0 2px 8px rgba(40,167,69,0.3);
+  }
+  .warning-text{
+    background:#fff3cd;
+    border:1px solid #ffeaa7;
+    border-radius:12px;
+    padding:15px;
+    margin:20px 0;
+    color:#856404;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .use-account-btn{
+    width:100%;
+    padding:15px;
+    background:#28a745;
+    color:white;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    box-shadow:0 4px 16px rgba(40,167,69,0.3);
+  }
+  .use-account-btn:hover{
+    background:#218838;
+    box-shadow:0 6px 20px rgba(40,167,69,0.4);
+    transform:translateY(-2px);
+  }
+
+  /* Main Card Styles */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--rad);
+    box-shadow:0 10px 30px rgba(0,0,0,0.1); padding:22px; margin:14px auto;
+  }
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:820px){ .grid-2{ grid-template-columns:1fr; } }
+  label{ display:block; text-align:left; margin:8px 0 6px; font-weight:600; color:var(--brand); }
+  input,select,button{
+    width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:12px; font-size:1rem;
+    background:#f8f9fa; color:var(--text); outline:none; transition:border-color .2s ease;
+  }
+  input:focus{ border-color:var(--brand); }
+  button{
+    background:var(--brand); color:#fff; font-weight:700; letter-spacing:.02em; border:none;
+    box-shadow:0 4px 14px rgba(0,82,204,0.3); cursor:pointer; text-transform:uppercase; transition:all .2s ease;
+  }
+  button:hover{ background:var(--brand2); box-shadow:0 6px 18px rgba(0,65,163,0.4); transform:translateY(-2px); }
+  button:disabled{ background:#b0bec5; cursor:not-allowed; box-shadow:none; transform:none; }
+  .btn-secondary{ background:#6c757d; color:#fff; box-shadow:0 4px 14px rgba(0,0,0,0.1); }
+  .btn-secondary:hover{ background:#5a6268; }
+  .btn-danger{ background:var(--err); color:#fff; box-shadow:0 4px 14px rgba(220,53,69,0.3); }
+  .btn-danger:hover{ background:#c82333; }
+  .mono{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    background:#e9ecef; padding:10px 12px; border-radius:12px; overflow-wrap:anywhere; color:#343a40;
+  }
+  .muted{ color:var(--muted); font-size:.92rem; }
+  .balances{ display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+  .pill{ background:#e9ecef; border:1px solid var(--line); padding:8px 14px; border-radius:999px; font-weight:600; }
+  .hidden{ display:none; }
+  .send-wrap{ display:none; margin-top:16px; text-align:left; border-top:1px solid var(--line); padding-top:16px; }
+  .send-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:640px){ .send-row{ grid-template-columns:1fr; } }
+
+  /* Trade Section Styles */
+  .trade-card{ padding:0; overflow:hidden; }
+  .trade-header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--line); }
+  .trade-header h3{ margin:0; font-size:1.2rem; }
+  .trade-header .icon{ font-size:1.5rem; cursor:pointer; transition:color 0.3s ease; }
+  .trade-header .icon:hover{ color:var(--brand); }
+  .trade-asset-selector{ display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:#f8f9fa; }
+  .asset-box{ display:flex; align-items:center; gap:8px; }
+  .asset-box img{ width:24px; height:24px; border-radius:50%; }
+  .asset-box .asset-name{ font-weight:600; }
+  .asset-box .asset-issuer{ font-size:.8rem; color:var(--muted); }
+  .swap-icon{ font-size:1.5rem; background:#fff; border-radius:50%; padding:5px; border:1px solid var(--line); cursor:pointer; transition:all 0.3s ease; }
+  .swap-icon:hover{ background:var(--brand); color:#fff; transform:rotate(180deg); }
+  .trade-tabs{ display:flex; border-bottom:1px solid var(--line); background:#f8f9fa; }
+  .trade-tabs .tab{ 
+    flex:1; padding:12px; text-align:center; cursor:pointer; font-weight:600; 
+    color:var(--muted); border-bottom:3px solid transparent; 
+    transition:all 0.3s ease; position:relative;
+  }
+  .trade-tabs .tab:hover{ background:rgba(0,82,204,0.1); color:var(--brand); }
+  .trade-tabs .tab.active{ color:var(--brand); border-bottom-color:var(--brand); background:#fff; }
+  .tab-content{ display:none; }
+  .tab-content.active{ display:block; }
+  .overview-content{ padding:20px; text-align:center; }
+  .price-display{ font-size:2.5rem; font-weight:bold; margin-bottom:10px; color:var(--brand); }
+  .price-change{ font-size:1rem; margin-bottom:20px; }
+  .price-change.positive{ color:var(--ok); }
+  .price-change.negative{ color:var(--err); }
+  .chart-timeframes{ display:flex; justify-content:center; gap:10px; margin-bottom:20px; }
+  .timeframe-btn{ 
+    padding:8px 15px; border-radius:8px; border:1px solid var(--line); 
+    background:#f8f9fa; color:var(--text); cursor:pointer; transition:all 0.3s ease;
+    font-size:0.9rem; font-weight:600;
+  }
+  .timeframe-btn:hover, .timeframe-btn.active{ background:var(--brand); color:#fff; border-color:var(--brand); }
+  .chart-container {
+    width:100%; 
+    height:200px; 
+    margin-bottom:20px;
+    position: relative;
+  }
+  .market-stats{ display:grid; grid-template-columns:1fr 1fr; gap:15px; text-align:left; }
+  .stat-item{ background:#f8f9fa; padding:12px; border-radius:8px; border:1px solid var(--line); }
+  .stat-label{ font-size:0.8rem; color:var(--muted); margin-bottom:4px; }
+  .stat-value{ font-weight:600; color:var(--text); }
+  .orderbook-content{ padding:10px 20px 20px; }
+  .orderbook-table{ width:100%; border-collapse:collapse; margin-bottom:10px; }
+  .orderbook-table th,.orderbook-table td{ text-align:right; padding:8px 4px; font-size:.9rem; }
+  .orderbook-table th{ color:var(--muted); font-weight:600; border-bottom:2px solid var(--line); }
+  .orderbook-table th:first-child,.orderbook-table td:first-child{ text-align:left; }
+  .orderbook-table .bid-row{ cursor:pointer; transition:background 0.2s ease; }
+  .orderbook-table .bid-row:hover{ background:rgba(40,167,69,0.1); }
+  .orderbook-table .bid-row td:nth-child(2){ color:var(--ok); font-weight:600; }
+  .orderbook-table .ask-row{ cursor:pointer; transition:background 0.2s ease; }
+  .orderbook-table .ask-row:hover{ background:rgba(220,53,69,0.1); }
+  .orderbook-table .ask-row td:nth-child(2){ color:var(--err); font-weight:600; }
+  .spread{ 
+    padding:12px 0; text-align:center; font-weight:bold; 
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line); 
+    margin:8px 0; background:#f8f9fa; border-radius:8px;
+  }
+  .trades-content{ padding:10px 20px 20px; }
+  .trades-table{ width:100%; border-collapse:collapse; }
+  .trades-table th,.trades-table td{ text-align:right; padding:8px 4px; font-size:.9rem; }
+  .trades-table th{ color:var(--muted); font-weight:600; border-bottom:2px solid var(--line); }
+  .trades-table th:first-child,.trades-table td:first-child{ text-align:left; }
+  .trade-buy{ color:var(--ok); }
+  .trade-sell{ color:var(--err); }
+  .trade-time{ color:var(--muted); font-size:0.8rem; }
+  .trade-actions{ display:flex; gap:15px; padding:20px; background:#f8f9fa; border-top:1px solid var(--line); }
+  .trade-actions button{ 
+    flex:1; padding:16px; font-size:1.1rem; border-radius:12px; text-transform:uppercase; 
+    font-weight:700; transition:all 0.3s ease; position:relative; overflow:hidden;
+  }
+  .trade-actions button:before{
+    content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition:left 0.5s; z-index:1;
+  }
+  .trade-actions button:hover:before{ left:100%; }
+  .btn-buy{ background:var(--ok); box-shadow:0 4px 14px rgba(40,167,69,0.3); }
+  .btn-buy:hover{ background:#218838; box-shadow:0 6px 20px rgba(40,167,69,0.4); transform:translateY(-2px); }
+  .btn-sell{ background:var(--err); color:#fff; box-shadow:0 4px 14px rgba(220,53,69,0.3); }
+  .btn-sell:hover{ background:#c82333; box-shadow:0 6px 20px rgba(220,53,69,0.4); transform:translateY(-2px); }
+  .loading-spinner{ 
+    display:inline-block; width:20px; height:20px; 
+    border:3px solid #f3f3f3; border-top:3px solid var(--brand); 
+    border-radius:50%; animation:spin 1s linear infinite; 
+  }
+  @keyframes spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+
+  /* Modal Styles */
+  .trade-modal{ display:none; position:fixed; inset:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+  .trade-modal.show{ display:flex; }
+  .modal-content{ 
+    background:var(--card); border:1px solid var(--line); border-radius:var(--rad); 
+    box-shadow:0 20px 40px rgba(0,0,0,0.15); padding:20px; max-width:420px; width:90%; 
+    max-height:90vh; overflow-y:auto; animation:modalSlideIn 0.3s ease-out;
+  }
+  @keyframes modalSlideIn{ from{ opacity:0; transform:translateY(-50px); } to{ opacity:1; transform:translateY(0); } }
+  .modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .modal-title{ font-size:1.5rem; font-weight:700; color:var(--brand); margin:0; }
+  .modal-close{ background:none; border:none; font-size:1.8rem; cursor:pointer; color:var(--muted); padding:0; }
+  .modal-close:hover{ color:var(--text); }
+  .modal-body{ margin-bottom:20px; }
+  .modal-footer{ display:flex; justify-content:flex-end; gap:10px; }
+
+  /* My Orders Modal */
+  #myOrdersModal .modal-content{ max-width:500px; }
+  #ordersList{ max-height:400px; overflow-y:auto; padding-right:10px; }
+  .order-item{ 
+    display:flex; align-items:center; padding:12px; border-radius:12px; 
+    border:1px solid var(--line); margin-bottom:10px; cursor:pointer; transition:all 0.3s ease;
+  }
+  .order-item:hover{ background:#f8f9fa; border-color:var(--brand); }
+  .order-item.selected{ background:rgba(0,82,204,0.1); border-color:var(--brand); box-shadow:0 0 0 2px rgba(0,82,204,0.2); }
+  .order-type{ font-weight:bold; padding:4px 8px; border-radius:8px; color:#fff; margin-right:12px; }
+  .order-type.buy{ background:var(--ok); }
+  .order-type.sell{ background:var(--err); }
+  .order-amount{ flex:1; font-weight:600; }
+  .order-price{ color:var(--muted); }
+
+  /* Toast Notification */
+  .toast-notification{
+    position:fixed; top:20px; right:20px; background:#333; color:#fff; padding:15px 25px;
+    border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:10001;
+    opacity:0; transform:translateY(-20px); transition:opacity 0.3s, transform 0.3s;
+  }
+  .toast-notification.show{ opacity:1; transform:translateY(0); }
+  .toast-notification.success{ background:var(--ok); }
+  .toast-notification.error{ background:var(--err); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="authSection">
+    <div class="logo-container">
+      <img src="https://i.ibb.co/YyC2M0N/20250802-225108.png" alt="Laam Wallet Logo">
+      <h1>Laam</h1>
+    </div>
+    
+    <div id="initialView">
+      <div class="import-card">
+        <div class="form-group">
+          <label for="secretKeyInput" class="form-label">Import Existing Wallet</label>
+          <input type="password" id="secretKeyInput" class="form-input" placeholder="Enter your 56-character secret key">
+        </div>
+        <div class="form-group">
+          <label for="savePasswordInput" class="form-label">Create a Password</label>
+          <input type="password" id="savePasswordInput" class="form-input" placeholder="8+ characters to secure your wallet">
+        </div>
+        <button id="importAndSaveBtn" class="import-button">Import wallet</button>
+        <div class="divider"><span class="divider-text">OR</span></div>
+        <div class="generate-link">
+          <button id="generateAccountBtn" class="generate-button">Create new wallet</button>
+          <p class="note-text">Generate a brand new Stellar account.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="unlockView" class="hidden">
+      <div class="import-card">
+        <div class="form-group">
+          <label for="walletPassword" class="form-label">Unlock Your Wallet</label>
+          <input type="password" id="walletPassword" class="form-input" placeholder="Enter your password">
+        </div>
+        <button id="unlockBtn" class="import-button">Unlock</button>
+        <div class="generate-link" style="margin-top:20px;">
+          <a href="#" id="resetWalletLink" class="generate-button" style="font-size:14px; color:#666;">Not your wallet? Reset</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loggedInView" class="hidden">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="margin:0; color:var(--brand);">My Wallet</h2>
+        <button id="logoutBtn" class="btn-secondary" style="width:auto; padding:8px 14px; font-size:.9rem;">Logout</button>
+      </div>
+      <p class="muted" style="margin-bottom:8px;">Public Key:</p>
+      <div id="publicKey" class="mono" style="margin-bottom:16px;"></div>
+      <p class="muted" style="margin-bottom:12px;">Balances:</p>
+      <div id="balance" class="balances"></div>
+      <div id="trustlineNotice" class="hidden" style="margin-top:16px; padding:12px; background:#fff3cd; border-radius:8px; color:#856404;">
+        To trade or hold Laam, you need to add a trustline.
+        <button id="addTrustlineBtn" style="margin-top:10px;">Add Laam Trustline</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid-2">
+        <button id="btnSendToggle">Send</button>
+        <button id="btnReceive">Receive</button>
+      </div>
+      <div id="sendForm" class="send-wrap">
+        <div class="send-row">
+          <div>
+            <label for="sendAsset">Asset</label>
+            <select id="sendAsset">
+              <option value="XLM">XLM</option>
+              <option value="LAAM">LAAM</option>
+              <option value="USDC">USDC</option>
+            </select>
+          </div>
+          <div>
+            <label for="sendAmount">Amount</label>
+            <input type="number" id="sendAmount" placeholder="0.00">
+          </div>
+        </div>
+        <label for="sendDest">Destination Address</label>
+        <input type="text" id="sendDest" placeholder="G...">
+        <label for="sendMemo">Memo (Optional)</label>
+        <input type="text" id="sendMemo" placeholder="Public message">
+        <button id="btnSend" style="margin-top:16px;">Send Payment</button>
+      </div>
+    </div>
+
+    <div class="card trade-card">
+      <div class="trade-header">
+        <h3>Trade Laam/XLM</h3>
+        <div>
+          <span class="icon" id="myOrdersBtn" title="My Orders">&#128221;</span>
+          <span class="icon" id="refreshTradeBtn" title="Refresh">&#8635;</span>
+        </div>
+      </div>
+      
+      <div class="trade-asset-selector">
+        <div class="asset-box">
+          <img src="https://i.ibb.co/YyC2M0N/20250802-225108.png" alt="Laam Logo">
+          <div>
+            <div class="asset-name">LAAM</div>
+            <div class="asset-issuer">laam.online</div>
+          </div>
+        </div>
+        <span class="swap-icon">&#8644;</span>
+        <div class="asset-box">
+          <img src="https://stellar.org/images/favicon/favicon-96x96.png" alt="XLM Logo">
+          <div>
+            <div class="asset-name">XLM</div>
+            <div class="asset-issuer">Native</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trade-tabs">
+        <div class="tab active" data-tab="overview">Overview</div>
+        <div class="tab" data-tab="orderbook">Orderbook</div>
+        <div class="tab" data-tab="trades">Trades</div>
+      </div>
+
+      <div id="overviewContent" class="tab-content active">
+        <div class="overview-content">
+          <div class="price-display" id="currentPrice">-</div>
+          <div class="price-change" id="priceChange">-</div>
+          <div class="chart-timeframes">
+            <button class="timeframe-btn active" data-resolution="3600000">1H</button>
+            <button class="timeframe-btn" data-resolution="86400000">1D</button>
+            <button class="timeframe-btn" data-resolution="604800000">1W</button>
+          </div>
+          <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+          </div>
+          <div class="market-stats">
+            <div class="stat-item">
+              <div class="stat-label">24h High</div>
+              <div class="stat-value" id="highPrice">-</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">24h Low</div>
+              <div class="stat-value" id="lowPrice">-</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">24h Volume (Laam)</div>
+              <div class="stat-value" id="volumeLaam">-</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">24h Volume (XLM)</div>
+              <div class="stat-value" id="volumeXlm">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="orderbookContent" class="tab-content">
+        <div class="orderbook-content">
+          <table class="orderbook-table">
+            <thead><tr><th>Amount (Laam)</th><th>Price (XLM)</th><th>Total (XLM)</th></tr></thead>
+            <tbody id="asksBody"></tbody>
+          </table>
+          <div class="spread" id="spreadValue">Spread: -</div>
+          <table class="orderbook-table">
+            <thead><tr><th>Amount (Laam)</th><th>Price (XLM)</th><th>Total (XLM)</th></tr></thead>
+            <tbody id="bidsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tradesContent" class="tab-content">
+        <div class="trades-content">
+          <table class="trades-table">
+            <thead><tr><th>Time</th><th>Price (XLM)</th><th>Amount (Laam)</th></tr></thead>
+            <tbody id="tradesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="trade-actions">
+        <button class="btn-buy" onclick="openTradeModal('buy')">Buy</button>
+        <button class="btn-sell" onclick="openTradeModal('sell')">Sell</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Display Modal -->
+  <div id="keyModal" class="key-modal">
+    <div class="key-modal-content">
+      <div class="key-modal-header">
+        <h2 class="key-modal-title">Your New Wallet</h2>
+        <button class="key-modal-close" onclick="closeKeyModal()">&times;</button>
+      </div>
+      <div class="warning-text">
+        <strong>IMPORTANT:</strong> Save your secret key in a secure, offline location. This is the only way to access your wallet. If you lose it, your funds will be lost forever.
+      </div>
+      <div class="key-display-group">
+        <label class="key-display-label">Secret Key (Keep this private!)</label>
+        <div class="key-display-container">
+          <textarea id="newSecretKey" class="key-display-input" readonly></textarea>
+          <button class="copy-btn" onclick="copyToClipboard('newSecretKey', this)">Copy</button>
+        </div>
+      </div>
+      <div class="key-display-group">
+        <label class="key-display-label">Public Key (This is your address)</label>
+        <div class="key-display-container">
+          <textarea id="newPublicKey" class="key-display-input" readonly></textarea>
+          <button class="copy-btn" onclick="copyToClipboard('newPublicKey', this)">Copy</button>
+        </div>
+      </div>
+      <button class="use-account-btn" onclick="useGeneratedAccount()">I've Saved My Key, Use This Account</button>
+    </div>
+  </div>
+
+  <!-- Trade Modal -->
+  <div id="tradeModal" class="trade-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="tradeModalTitle" class="modal-title"></h3>
+        <button class="modal-close" onclick="closeTradeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="tradePrice">Price (XLM)</label>
+        <input type="number" id="tradePrice" placeholder="0.00">
+        <label for="tradeAmount">Amount (Laam)</label>
+        <input type="number" id="tradeAmount" placeholder="0.00">
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
+          <button class="btn-secondary" style="width:auto; padding:6px 10px; font-size:.8rem;" onclick="setTradeAmountPercentage(0.25)">25%</button>
+          <button class="btn-secondary" style="width:auto; padding:6px 10px; font-size:.8rem;" onclick="setTradeAmountPercentage(0.50)">50%</button>
+          <button class="btn-secondary" style="width:auto; padding:6px 10px; font-size:.8rem;" onclick="setTradeAmountPercentage(0.75)">75%</button>
+          <button class="btn-secondary" style="width:auto; padding:6px 10px; font-size:.8rem;" onclick="setTradeAmountPercentage(1.00)">100%</button>
+        </div>
+        <p style="margin-top:15px;">Total: <span id="tradeTotal">0.00</span> XLM</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeTradeModal()">Cancel</button>
+        <button id="confirmTradeBtn"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Orders Modal -->
+  <div id="myOrdersModal" class="trade-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">My Open Orders</h3>
+        <button class="modal-close" onclick="closeMyOrdersModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="ordersList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="promptEditOffer()">Edit Order</button>
+        <button class="btn-danger" onclick="confirmCancelOffer()">Cancel Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Order Modal -->
+  <div id="editOrderModal" class="trade-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Order</h3>
+        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="editAmount">Amount (Laam)</label>
+        <input type="number" id="editAmount">
+        <label for="editPrice">Price (XLM)</label>
+        <input type="number" id="editPrice">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button id="confirmEditBtn" class="btn-buy">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast-notification"></div>
+
+<script>
+    // Stellar and Asset Configuration
+    const LAAM_TOKEN = {code: 'Laam', issuer: 'GB7WZHXV4FCATLV2LZFLYU7A74BD5WALPUMOU4CY4DRJGJIL3EW3DGXA'};
+    const USDC_TOKEN = {code: 'USDC', issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'};
+    let server, LAAM_ASSET, USDC_ASSET;
+    let currentKeypair = null;
+    let generatedKeypair = null; // To hold newly generated keypair before user saves it
+    let currentOfferId = null;
+    let priceChart = null;
+
+    // --- UTILITY FUNCTIONS ---
+    function initializeStellar() {
+      try {
+        server = new StellarSdk.Server('https://horizon.stellar.org');
+        console.log('Stellar server initialized');
+      } catch (error) {
+        console.error('Failed to initialize Stellar server:', error);
+        showError('Failed to initialize Stellar connection');
+      }
+    }
+
+    function initializeAssets() {
+      try {
+        LAAM_ASSET = new StellarSdk.Asset(LAAM_TOKEN.code, LAAM_TOKEN.issuer);
+        USDC_ASSET = new StellarSdk.Asset(USDC_TOKEN.code, USDC_TOKEN.issuer);
+        console.log('Assets initialized');
+      } catch (error) {
+        console.error('Failed to initialize assets:', error);
+        showError('Failed to initialize assets');
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast-notification show ${type}`;
+      setTimeout(() => {
+        toast.className = 'toast-notification';
+      }, 3000);
+    }
+
+    function showError(message) { 
+      console.error('Error:', message);
+      showToast(message, 'error'); 
+    }
+    
+    function showSuccess(message) { 
+      console.log('Success:', message);
+      showToast(message, 'success'); 
+    }
+
+    function encryptSecretKey(secretKey, password) {
+      try {
+        return CryptoJS.AES.encrypt(secretKey, password).toString();
+      } catch (error) {
+        console.error('Encryption error:', error);
+        throw new Error('Failed to encrypt secret key');
+      }
+    }
+
+    function decryptSecretKey(encryptedKey, password) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedKey, password);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        return decrypted || null;
+      } catch (error) {
+        console.error('Decryption error:', error);
+        return null;
+      }
+    }
+
+    function copyToClipboard(elementId, button) {
+      const input = document.getElementById(elementId);
+      input.select();
+      document.execCommand('copy');
+      button.textContent = 'Copied!';
+      button.classList.add('copied');
+      setTimeout(() => {
+        button.textContent = 'Copy';
+        button.classList.remove('copied');
+      }, 2000);
+    }
+
+    function validateSecretKey(secretKey) {
+      if (!secretKey || typeof secretKey !== 'string') {
+        return false;
+      }
+      
+      // Check if it starts with 'S' and is 56 characters long
+      if (!secretKey.startsWith('S') || secretKey.length !== 56) {
+        return false;
+      }
+      
+      try {
+        // Try to create a keypair to validate the key
+        StellarSdk.Keypair.fromSecret(secretKey);
+        return true;
+      } catch (error) {
+        console.error('Invalid secret key:', error);
+        return false;
+      }
+    }
+
+    // --- WALLET MANAGEMENT ---
+    function checkSavedWallet() {
+      try {
+        const encryptedKey = localStorage.getItem('laam_wallet_key');
+        if (encryptedKey) {
+          document.getElementById('initialView').classList.add('hidden');
+          document.getElementById('unlockView').classList.remove('hidden');
+          const publicKey = localStorage.getItem('laam_wallet_public');
+          if (publicKey) {
+            document.getElementById('unlockView').querySelector('.form-label').textContent = `Unlock ${publicKey.substring(0,6)}...${publicKey.substring(50)}`;
+          }
+        } else {
+          document.getElementById('initialView').classList.remove('hidden');
+          document.getElementById('unlockView').classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Error checking saved wallet:', error);
+        showError('Error checking saved wallet');
+      }
+    }
+
+    async function loadWallet() {
+      if (!currentKeypair) {
+        showError('No keypair available');
+        return;
+      }
+      
+      try {
+        document.getElementById('publicKey').textContent = currentKeypair.publicKey();
+        await updateBalanceDisplay();
+        await loadTradeData();
+      } catch (error) {
+        console.error('Error loading wallet:', error);
+        showError('Failed to load wallet data');
+      }
+    }
+
+    async function updateBalanceDisplay() {
+      const balanceDiv = document.getElementById('balance');
+      balanceDiv.innerHTML = '<div class="loading-spinner"></div>';
+      
+      try {
+        const account = await server.loadAccount(currentKeypair.publicKey());
+        let balancesHTML = '';
+        let hasLaamTrustline = false;
+        
+        account.balances.forEach(balance => {
+          let assetName = '';
+          if (balance.asset_type === 'native') {
+            assetName = 'XLM';
+          } else {
+            assetName = balance.asset_code;
+            if (balance.asset_code === LAAM_TOKEN.code && balance.asset_issuer === LAAM_TOKEN.issuer) {
+              hasLaamTrustline = true;
+            }
+          }
+          balancesHTML += `<div class="pill">${parseFloat(balance.balance).toFixed(4)} ${assetName}</div>`;
+        });
+        
+        balanceDiv.innerHTML = balancesHTML;
+        
+        if (!hasLaamTrustline) {
+          document.getElementById('trustlineNotice').classList.remove('hidden');
+        } else {
+          document.getElementById('trustlineNotice').classList.add('hidden');
+        }
+        
+      } catch (error) {
+        console.error('Error updating balance:', error);
+        if (error.response && error.response.status === 404) {
+          balanceDiv.innerHTML = '<div class="pill">0.0000 XLM</div>';
+          showError('Account not funded. Send at least 1 XLM to activate.');
+          document.getElementById('trustlineNotice').classList.remove('hidden');
+        } else {
+          balanceDiv.innerHTML = 'Error loading balance';
+          showError('Error loading balance: ' + error.message);
+        }
+      }
+    }
+
+    // --- KEY GENERATION & IMPORT MODAL ---
+    function openKeyModal(secretKey, publicKey) {
+      document.getElementById('newSecretKey').value = secretKey;
+      document.getElementById('newPublicKey').value = publicKey;
+      document.getElementById('keyModal').classList.add('show');
+    }
+
+    function closeKeyModal() {
+      document.getElementById('keyModal').classList.remove('show');
+      generatedKeypair = null; // Clear the generated key if modal is closed without saving
+    }
+
+    async function useGeneratedAccount() {
+      if (!generatedKeypair) {
+        showError('No generated account available');
+        return;
+      }
+
+      const password = prompt('Create a password to encrypt this new wallet (min. 8 characters):');
+      if (!password || password.length < 8) {
+        showError('Password must be at least 8 characters long.');
+        return;
+      }
+
+      try {
+        currentKeypair = generatedKeypair;
+        const secretKey = currentKeypair.secret();
+        
+        const encryptedKey = encryptSecretKey(secretKey, password);
+        localStorage.setItem('laam_wallet_key', encryptedKey);
+        localStorage.setItem('laam_wallet_public', currentKeypair.publicKey());
+        
+        closeKeyModal();
+        
+        await loadWallet();
+        
+        showSuccess('New wallet created and saved!');
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('loggedInView').classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Error using generated account:', error);
+        showError('Failed to save new wallet: ' + error.message);
+      }
+    }
+
+    // --- TRADE DATA & ACTIONS ---
+    async function loadTradeData() {
+      console.log('Loading trade data...');
+      const loadingHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;"><div class="loading-spinner"></div></td></tr>';
+      document.getElementById('bidsBody').innerHTML = loadingHTML;
+      document.getElementById('asksBody').innerHTML = loadingHTML;
+      document.getElementById('tradesBody').innerHTML = loadingHTML;
+      
+      try {
+        // Load orderbook
+        const orderbook = await server.orderbook(LAAM_ASSET, StellarSdk.Asset.native()).call();
+        
+        const bidsBody = document.getElementById('bidsBody');
+        bidsBody.innerHTML = '';
+        orderbook.bids.slice(0, 15).forEach(bid => {
+          const total = (bid.amount * bid.price).toFixed(7);
+          bidsBody.innerHTML += `<tr class="bid-row" onclick="setTradePriceAndAmount('${bid.price}', '${bid.amount}')"><td>${parseFloat(bid.amount).toFixed(2)}</td><td>${parseFloat(bid.price).toFixed(7)}</td><td>${total}</td></tr>`;
+        });
+
+        const asksBody = document.getElementById('asksBody');
+        asksBody.innerHTML = '';
+        orderbook.asks.slice(0, 15).forEach(ask => {
+          const total = (ask.amount * ask.price).toFixed(7);
+          asksBody.innerHTML += `<tr class="ask-row" onclick="setTradePriceAndAmount('${ask.price}', '${ask.amount}')"><td>${parseFloat(ask.amount).toFixed(2)}</td><td>${parseFloat(ask.price).toFixed(7)}</td><td>${total}</td></tr>`;
+        });
+
+        if (orderbook.bids.length > 0 && orderbook.asks.length > 0) {
+          const spread = (orderbook.asks[0].price - orderbook.bids[0].price).toFixed(7);
+          document.getElementById('spreadValue').textContent = `Spread: ${spread} XLM`;
+        } else {
+          document.getElementById('spreadValue').textContent = 'Spread: -';
+        }
+
+        // Load recent trades
+        const trades = await server.trades().forAssetPair(LAAM_ASSET, StellarSdk.Asset.native()).order('desc').limit(20).call();
+        const tradesBody = document.getElementById('tradesBody');
+        tradesBody.innerHTML = '';
+        trades.records.forEach(trade => {
+          const isBuy = trade.base_is_seller; // If base (LAAM) is seller, it's a sell trade from perspective of LAAM buyer
+          const tradeClass = isBuy ? 'trade-buy' : 'trade-sell';
+          const time = new Date(trade.ledger_close_time).toLocaleTimeString();
+          tradesBody.innerHTML += `
+            <tr class="${tradeClass}">
+              <td class="trade-time">${time}</td>
+              <td>${parseFloat(trade.price.n/trade.price.d).toFixed(7)}</td>
+              <td>${parseFloat(trade.base_amount).toFixed(2)}</td>
+            </tr>`;
+        });
+
+        // Load market overview
+        await loadMarketOverview();
+
+      } catch (error) {
+        console.error('Error loading trade data:', error);
+        showError('Failed to load market data.');
+      }
+    }
+
+    async function loadMarketOverview(resolution = 3600000) { // Default to 1 hour
+      console.log(`Loading market overview with resolution: ${resolution}`);
+      document.getElementById('currentPrice').innerHTML = '<div class="loading-spinner" style="width:30px; height:30px;"></div>';
+      
+      try {
+        const now = new Date().getTime();
+        const startTime = now - (24 * 60 * 60 * 1000); // 24 hours ago
+
+        const tradeAggregations = await server.tradeAggregations(LAAM_ASSET, StellarSdk.Asset.native(), startTime, now, resolution).limit(200).order('desc').call();
+        
+        const records = tradeAggregations.records.reverse(); // oldest to newest
+
+        if (records.length > 0) {
+          const latest = records[records.length - 1];
+          const first = records[0];
+          
+          document.getElementById('currentPrice').textContent = parseFloat(latest.close).toFixed(7);
+          
+          const change = ((latest.close - first.open) / first.open * 100).toFixed(2);
+          const changeEl = document.getElementById('priceChange');
+          changeEl.textContent = `${change}% (24h)`;
+          changeEl.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
+
+          document.getElementById('highPrice').textContent = parseFloat(latest.high).toFixed(7);
+          document.getElementById('lowPrice').textContent = parseFloat(latest.low).toFixed(7);
+          document.getElementById('volumeLaam').textContent = parseFloat(latest.base_volume).toFixed(2);
+          document.getElementById('volumeXlm').textContent = parseFloat(latest.counter_volume).toFixed(2);
+
+          // Update chart
+          const chartLabels = records.map(r => new Date(r.timestamp));
+          const chartData = records.map(r => parseFloat(r.close));
+          updatePriceChart(chartLabels, chartData);
+
+        } else {
+          document.getElementById('currentPrice').textContent = '-';
+          document.getElementById('priceChange').textContent = '-';
+          document.getElementById('highPrice').textContent = '-';
+          document.getElementById('lowPrice').textContent = '-';
+          document.getElementById('volumeLaam').textContent = '-';
+          document.getElementById('volumeXlm').textContent = '-';
+          updatePriceChart([], []); // Clear chart
+        }
+      } catch (error) {
+        console.error('Error loading market overview:', error);
+        showError('Failed to load market overview.');
+      }
+    }
+
+    function updatePriceChart(labels, data) {
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      if (priceChart) {
+        priceChart.destroy();
+      }
+      priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Price (XLM)',
+            data: data,
+            borderColor: 'var(--brand)',
+            backgroundColor: 'rgba(0, 82, 204, 0.1)',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'hour',
+                tooltipFormat: 'll HH:mm'
+              },
+              ticks: { display: false },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { display: false },
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+            }
+          }
+        }
+      });
+    }
+
+    // --- TRADE MODAL & EXECUTION ---
+    function openTradeModal(type) {
+      const modal = document.getElementById('tradeModal');
+      const title = document.getElementById('tradeModalTitle');
+      const confirmBtn = document.getElementById('confirmTradeBtn');
+      
+      title.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Laam`;
+      confirmBtn.textContent = `Confirm ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+      confirmBtn.className = `btn-${type}`;
+      confirmBtn.onclick = () => confirmTrade(type);
+      
+      modal.classList.add('show');
+    }
+
+    function closeTradeModal() {
+      document.getElementById('tradeModal').classList.remove('show');
+      document.getElementById('tradePrice').value = '';
+      document.getElementById('tradeAmount').value = '';
+      document.getElementById('tradeTotal').textContent = '0.00';
+    }
+
+    function setTradePriceAndAmount(price, amount) {
+      document.getElementById('tradePrice').value = parseFloat(price).toFixed(7);
+      document.getElementById('tradeAmount').value = parseFloat(amount).toFixed(2);
+      updateTradeTotal();
+    }
+
+    async function setTradeAmountPercentage(percentage) {
+      try {
+        const tradeType = document.getElementById('tradeModalTitle').textContent.toLowerCase().includes('buy') ? 'buy' : 'sell';
+        const account = await server.loadAccount(currentKeypair.publicKey());
+        let maxAmount = 0;
+
+        if (tradeType === 'buy') { // Buying Laam with XLM
+          const xlmBalance = account.balances.find(b => b.asset_type === 'native');
+          const price = parseFloat(document.getElementById('tradePrice').value) || 0;
+          if (xlmBalance && price > 0) {
+            // Subtract reserve and a buffer for fees
+            const availableXlm = parseFloat(xlmBalance.balance) - (2 + account.subentry_count * 0.5) - 0.1;
+            maxAmount = availableXlm / price;
+          }
+        } else { // Selling Laam for XLM
+          const laamBalance = account.balances.find(b => b.asset_code === LAAM_TOKEN.code);
+          if (laamBalance) {
+            maxAmount = parseFloat(laamBalance.balance);
+          }
+        }
+
+        document.getElementById('tradeAmount').value = (maxAmount * percentage).toFixed(7);
+        updateTradeTotal();
+      } catch (error) {
+        console.error('Error setting trade amount percentage:', error);
+        showError('Failed to calculate amount');
+      }
+    }
+
+    function updateTradeTotal() {
+      const price = parseFloat(document.getElementById('tradePrice').value) || 0;
+      const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+      document.getElementById('tradeTotal').textContent = (price * amount).toFixed(7);
+    }
+
+    async function confirmTrade(type) {
+      const price = document.getElementById('tradePrice').value;
+      const amount = document.getElementById('tradeAmount').value;
+
+      if (!price || !amount || price <= 0 || amount <= 0) {
+        showError('Please enter a valid price and amount.');
+        return;
+      }
+
+      const confirmBtn = document.getElementById('confirmTradeBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<div class="loading-spinner"></div>';
+
+      try {
+        const selling = type === 'buy' ? StellarSdk.Asset.native() : LAAM_ASSET;
+        const buying = type === 'buy' ? LAAM_ASSET : StellarSdk.Asset.native();
+        
+        const account = await server.loadAccount(currentKeypair.publicKey());
+        
+        const transaction = new StellarSdk.TransactionBuilder(account, {
+          fee: StellarSdk.BASE_FEE,
+          networkPassphrase: StellarSdk.Networks.PUBLIC
+        })
+        .addOperation(StellarSdk.Operation.manageSellOffer({
+          selling: selling,
+          buying: buying,
+          amount: amount,
+          price: price,
+          offerId: 0 // 0 for new offer
+        }))
+        .setTimeout(180)
+        .build();
+
+        transaction.sign(currentKeypair);
+        await server.submitTransaction(transaction);
+
+        showSuccess(`Successfully placed ${type} order!`);
+        closeTradeModal();
+        await loadTradeData();
+        await updateBalanceDisplay();
+
+      } catch (error) {
+        console.error('Trade error:', error);
+        showError('Failed to place order: ' + (error.response?.data?.extras?.result_codes?.operations?.[0] || error.message));
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = `Confirm ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+      }
+    }
+
+    // --- MY ORDERS & CANCELLATION ---
+    async function loadUserOffers() {
+      if (!currentKeypair) return [];
+      try {
+        const account = await server.loadAccount(currentKeypair.publicKey());
+        const offers = await server.offers().forAccount(account.id).limit(200).call();
+        return offers.records.filter(offer => 
+          (offer.selling.asset_code === LAAM_TOKEN.code && offer.buying.asset_type === 'native') ||
+          (offer.buying.asset_code === LAAM_TOKEN.code && offer.selling.asset_type === 'native')
+        );
+      } catch (error) {
+        console.error('Error loading user offers:', error);
+        return [];
+      }
+    }
+
+    async function cancelOffer(offerId) {
+      try {
+        const account = await server.loadAccount(currentKeypair.publicKey());
+        const offer = await server.offers().offer(offerId).call();
+
+        const operation = StellarSdk.Operation.manageSellOffer({
+          selling: offer.selling,
+          buying: offer.buying,
+          amount: '0', // Cancel by setting amount to 0
+          price: offer.price,
+          offerId: offerId
+        });
+
+        const transaction = new StellarSdk.TransactionBuilder(account, {
+          fee: StellarSdk.BASE_FEE,
+          networkPassphrase: StellarSdk.Networks.PUBLIC
+        })
+        .addOperation(operation)
+        .setTimeout(180)
+        .build();
+        
+        transaction.sign(currentKeypair);
+        const result = await server.submitTransaction(transaction);
+        return result;
+      } catch (error) {
+        console.error('Error canceling offer:', error);
+        throw error;
+      }
+    }
+
+    // My Orders Modal functions
+    async function openMyOrdersModal() {
+      const modal = document.getElementById('myOrdersModal');
+      const ordersList = document.getElementById('ordersList');
+      
+      modal.classList.add('show');
+      ordersList.innerHTML = '<div class="loading-spinner"></div>';
+      
+      try {
+        const offers = await loadUserOffers();
+        
+        if (offers.length === 0) {
+          ordersList.innerHTML = '<p style="text-align:center; padding:20px;">No active orders found</p>';
+          return;
+        }
+        
+        let html = '';
+        offers.forEach(offer => {
+          const isSell = offer.selling.asset_code === LAAM_TOKEN.code;
+          const price = isSell ? (1/offer.price).toFixed(7) : offer.price;
+          
+          html += `
+            <div class="order-item" data-id="${offer.id}">
+              <div class="order-type ${isSell ? 'sell' : 'buy'}">${isSell ? 'SELL' : 'BUY'}</div>
+              <div class="order-amount">${offer.amount} Laam</div>
+              <div class="order-price">${price} XLM</div>
+            </div>
+          `;
+        });
+        
+        ordersList.innerHTML = html;
+        
+        document.querySelectorAll('.order-item').forEach(item => {
+          item.addEventListener('click', function() {
+            currentOfferId = this.getAttribute('data-id');
+            document.querySelectorAll('.order-item').forEach(i => i.classList.remove('selected'));
+            this.classList.add('selected');
+          });
+        });
+        
+      } catch (error) {
+        console.error('Error loading offers:', error);
+        ordersList.innerHTML = '<p style="text-align:center; padding:20px;">Error loading orders</p>';
+      }
+    }
+
+    function closeMyOrdersModal() {
+      const modal = document.getElementById('myOrdersModal');
+      modal.classList.remove('show');
+      currentOfferId = null;
+    }
+
+    // Edit offer prompt
+    async function promptEditOffer() {
+      if (!currentOfferId) {
+        showError('Please select an order first');
+        return;
+      }
+      
+      try {
+        const offer = await server.offers().offer(currentOfferId).call();
+        const isSell = offer.selling.asset_code === LAAM_TOKEN.code;
+        const price = isSell ? (1/offer.price).toFixed(7) : offer.price;
+        
+        document.getElementById('editAmount').value = offer.amount;
+        document.getElementById('editPrice').value = price;
+        
+        document.getElementById('editOrderModal').classList.add('show');
+      } catch (error) {
+        console.error('Error loading offer details:', error);
+        showError('Failed to load offer details');
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('editOrderModal').classList.remove('show');
+    }
+
+    // Confirm cancel offer
+    async function confirmCancelOffer() {
+      if (!currentOfferId) {
+        showError('Please select an order first');
+        return;
+      }
+      
+      if (confirm('Are you sure you want to cancel this order?')) {
+        try {
+          await cancelOffer(currentOfferId);
+          showSuccess('Order cancelled successfully!');
+          closeMyOrdersModal();
+          // Refresh the orders list
+          await openMyOrdersModal();
+        } catch (error) {
+          showError('Failed to cancel order: ' + error.message);
+        }
+      }
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing...');
+      
+      // Check if required libraries are loaded
+      if (typeof StellarSdk === 'undefined') {
+        console.error('StellarSdk is not defined');
+        showError('Stellar SDK failed to load. Please refresh the page.');
+        return;
+      }
+      
+      if (typeof CryptoJS === 'undefined') {
+        console.error('CryptoJS is not defined');
+        showError('CryptoJS failed to load. Please refresh the page.');
+        return;
+      }
+      
+      console.log('All libraries loaded successfully');
+      
+      initializeStellar();
+      initializeAssets();
+      checkSavedWallet();
+      
+      // Add input focus effects
+      document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'scale(1)';
+        });
+      });
+
+      // Import wallet button event listener
+      document.getElementById('importAndSaveBtn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        console.log('Import button clicked');
+        
+        const secretKey = document.getElementById('secretKeyInput').value.trim();
+        const password = document.getElementById('savePasswordInput').value;
+        
+        console.log('Secret key length:', secretKey.length);
+        console.log('Password length:', password.length);
+        
+        if (!validateSecretKey(secretKey)) {
+          showError('Invalid secret key format. Secret key should start with S and be 56 characters long.');
+          return;
+        }
+        
+        if (password.length < 8) {
+          showError('Password must be at least 8 characters long.');
+          return;
+        }
+        
+        this.textContent = 'Importing...';
+        this.disabled = true;
+        
+        try {
+          console.log('Validating secret key...');
+          currentKeypair = StellarSdk.Keypair.fromSecret(secretKey);
+          console.log('Secret key validated successfully');
+          
+          console.log('Encrypting and saving...');
+          const encryptedKey = encryptSecretKey(secretKey, password);
+          localStorage.setItem('laam_wallet_key', encryptedKey);
+          localStorage.setItem('laam_wallet_public', currentKeypair.publicKey());
+          console.log('Wallet saved successfully');
+          
+          console.log('Loading wallet...');
+          await loadWallet();
+          
+          showSuccess('Wallet imported successfully!');
+          document.getElementById('authSection').classList.add('hidden');
+          document.getElementById('loggedInView').classList.remove('hidden');
+          
+        } catch (error) {
+          console.error('Import error:', error);
+          showError('Failed to import wallet: ' + error.message);
+        } finally {
+          this.textContent = 'Import wallet';
+          this.disabled = false;
+        }
+      });
+      
+      // Generate account button event listener
+      document.getElementById('generateAccountBtn').addEventListener('click', function() {
+        console.log('Generate account button clicked');
+        
+        try {
+          generatedKeypair = StellarSdk.Keypair.random();
+          const secretKey = generatedKeypair.secret();
+          const publicKey = generatedKeypair.publicKey();
+          
+          console.log('New keypair generated successfully');
+          
+          openKeyModal(secretKey, publicKey);
+          
+        } catch (error) {
+          console.error('Generate account error:', error);
+          showError('Failed to generate account: ' + error.message);
+        }
+      });
+      
+      // Unlock button event listener
+      document.getElementById('unlockBtn').addEventListener('click', async function() {
+        const password = document.getElementById('walletPassword').value;
+        const encryptedKey = localStorage.getItem('laam_wallet_key');
+        
+        if (!encryptedKey) {
+          showError('No wallet found. Please import a wallet first.');
+          return;
+        }
+        
+        if (!password) {
+          showError('Please enter your password.');
+          return;
+        }
+        
+        this.textContent = 'Unlocking...';
+        this.disabled = true;
+        
+        try {
+          const decryptedKey = decryptSecretKey(encryptedKey, password);
+          
+          if (!decryptedKey) {
+            showError('Incorrect password.');
+            return;
+          }
+          
+          currentKeypair = StellarSdk.Keypair.fromSecret(decryptedKey);
+          
+          await loadWallet();
+          
+          showSuccess('Wallet unlocked successfully!');
+          document.getElementById('authSection').classList.add('hidden');
+          document.getElementById('loggedInView').classList.remove('hidden');
+          
+        } catch (error) {
+          console.error('Unlock error:', error);
+          showError('Failed to unlock wallet: ' + error.message);
+        } finally {
+          this.textContent = 'Unlock';
+          this.disabled = false;
+        }
+      });
+      
+      // Reset wallet link event listener
+      document.getElementById('resetWalletLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (confirm('This will remove your saved wallet. Are you sure?')) {
+          localStorage.removeItem('laam_wallet_key');
+          localStorage.removeItem('laam_wallet_public');
+          
+          document.getElementById('unlockView').classList.add('hidden');
+          document.getElementById('initialView').classList.remove('hidden');
+          
+          showSuccess('Wallet reset successfully.');
+        }
+      });
+      
+      // Logout button event listener
+      document.getElementById('logoutBtn').addEventListener('click', function() {
+        currentKeypair = null;
+        
+        document.getElementById('loggedInView').classList.add('hidden');
+        document.getElementById('authSection').classList.remove('hidden');
+        
+        const encryptedKey = localStorage.getItem('laam_wallet_key');
+        if (encryptedKey) {
+          document.getElementById('initialView').classList.add('hidden');
+          document.getElementById('unlockView').classList.remove('hidden');
+        } else {
+          document.getElementById('unlockView').classList.add('hidden');
+          document.getElementById('initialView').classList.remove('hidden');
+        }
+      });
+      
+      // Add trustline button event listener
+      document.getElementById('addTrustlineBtn').addEventListener('click', async function() {
+        if (!currentKeypair || !LAAM_ASSET) {
+          showError('Wallet not loaded or asset not initialized.');
+          return;
+        }
+        
+        this.textContent = 'Adding Trustline...';
+        this.disabled = true;
+        
+        try {
+          const account = await server.loadAccount(currentKeypair.publicKey());
+          
+          const transaction = new StellarSdk.TransactionBuilder(account, {
+            fee: StellarSdk.BASE_FEE,
+            networkPassphrase: StellarSdk.Networks.PUBLIC
+          })
+          .addOperation(StellarSdk.Operation.changeTrust({
+            asset: LAAM_ASSET
+          }))
+          .setTimeout(180)
+          .build();
+          
+          transaction.sign(currentKeypair);
+          
+          const result = await server.submitTransaction(transaction);
+          
+          showSuccess('Laam trustline added successfully!');
+          
+          await updateBalanceDisplay();
+          
+        } catch (error) {
+          console.error('Add trustline error:', error);
+          showError('Failed to add trustline: ' + error.message);
+        } finally {
+          this.textContent = 'Add Laam Trustline';
+          this.disabled = false;
+        }
+      });
+      
+      // Send toggle button event listener
+      document.getElementById('btnSendToggle').addEventListener('click', function() {
+        const sendForm = document.getElementById('sendForm');
+        if (sendForm.style.display === 'none' || sendForm.style.display === '') {
+          sendForm.style.display = 'block';
+        } else {
+          sendForm.style.display = 'none';
+        }
+      });
+        
+      // Receive button event listener
+      document.getElementById('btnReceive').addEventListener('click', function() {
+          const publicKey = currentKeypair ? currentKeypair.publicKey() : "GB7WZHXV4FCATLV2LZFLYU7A74BD5WALPUMOU4CY4DRJGJIL3EW3DGXA";
+          
+          // Create a modal to show the receive address (QR code and text)
+          const receiveModal = document.createElement('div');
+          receiveModal.style.cssText = `
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0,0,0,0.7);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              z-index: 10000;
+          `;
+          
+          receiveModal.innerHTML = `
+              <div style="background: white; padding: 25px; border-radius: 20px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                  <h3 style="color: #1976d2; margin-top: 0; margin-bottom: 20px;">Your Receive Address</h3>
+                  <div style="background: white; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid #e0e0e0;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${publicKey}" 
+                           alt="QR Code" style="max-width: 180px; border-radius: 8px;">
+                  </div>
+                  <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Scan this QR code or copy the address below</div>
+                  <div class="mono" style="font-size: 13px; margin: 15px 0; padding: 12px; background: #f8f9fa; border-radius: 12px; word-break: break-all; line-height: 1.5;">
+                      ${publicKey}
+                  </div>
+                  <button onclick="this.parentElement.parentElement.remove()" 
+                          style="background: #1976d2; color: white; border: none; padding: 12px 24px; 
+                                 border-radius: 12px; cursor: pointer; font-weight: 600; margin-top: 10px;">
+                      Close
+                  </button>
+              </div>
+          `;
+          
+          document.body.appendChild(receiveModal);
+      });
+      
+      // Send payment button event listener
+      document.getElementById('btnSend').addEventListener('click', async function() {
+        const asset = document.getElementById('sendAsset').value;
+        const amount = document.getElementById('sendAmount').value;
+        const destination = document.getElementById('sendDest').value;
+        const memo = document.getElementById('sendMemo').value;
+        
+        if (!amount || !destination) {
+          showError('Please fill in all fields.');
+          return;
+        }
+        
+        if (!currentKeypair) {
+          showError('Wallet not loaded.');
+          return;
+        }
+        
+        this.textContent = 'Sending...';
+        this.disabled = true;
+        
+        try {
+          const account = await server.loadAccount(currentKeypair.publicKey());
+          
+          let operation;
+          if (asset === 'XLM') {
+            operation = StellarSdk.Operation.payment({
+              destination: destination,
+              asset: StellarSdk.Asset.native(),
+              amount: amount
+            });
+          } else if (asset === 'LAAM') {
+            operation = StellarSdk.Operation.payment({
+              destination: destination,
+              asset: LAAM_ASSET,
+              amount: amount
+            });
+          } else if (asset === 'USDC') {
+            operation = StellarSdk.Operation.payment({
+              destination: destination,
+              asset: USDC_ASSET,
+              amount: amount
+            });
+          }
+          
+          const transactionBuilder = new StellarSdk.TransactionBuilder(account, {
+            fee: StellarSdk.BASE_FEE,
+            networkPassphrase: StellarSdk.Networks.PUBLIC
+          });
+
+          if (memo) {
+            transactionBuilder.addMemo(StellarSdk.Memo.text(memo));
+          }
+
+          const transaction = transactionBuilder
+            .addOperation(operation)
+            .setTimeout(180)
+            .build();
+          
+          transaction.sign(currentKeypair);
+          
+          const result = await server.submitTransaction(transaction);
+          
+          showSuccess('Transaction sent successfully!');
+          
+          document.getElementById('sendAmount').value = '';
+          document.getElementById('sendDest').value = '';
+          document.getElementById('sendMemo').value = '';
+          
+          await updateBalanceDisplay();
+          
+        } catch (error) {
+          console.error('Send error:', error);
+          showError('Failed to send transaction: ' + (error.response?.data?.extras?.result_codes?.operations?.[0] || error.message));
+        } finally {
+          this.textContent = 'Send Payment';
+          this.disabled = false;
+        }
+      });
+
+      // Trade Tab Switching
+      document.querySelectorAll('.trade-tabs .tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.trade-tabs .tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+
+          document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          document.getElementById(this.dataset.tab + 'Content').classList.add('active');
+        });
+      });
+
+      // Refresh button
+      document.getElementById('refreshTradeBtn').addEventListener('click', loadTradeData);
+
+      // My Orders button
+      document.getElementById('myOrdersBtn').addEventListener('click', openMyOrdersModal);
+
+      // Chart timeframe buttons
+      document.querySelectorAll('.timeframe-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          loadMarketOverview(parseInt(this.dataset.resolution));
+        });
+      });
+
+      // Update trade total on input
+      document.getElementById('tradePrice').addEventListener('input', updateTradeTotal);
+      document.getElementById('tradeAmount').addEventListener('input', updateTradeTotal);
+
+      // Confirm Edit Button
+      document.getElementById('confirmEditBtn').addEventListener('click', async function() {
+        if (!currentOfferId) return;
+
+        const newAmount = document.getElementById('editAmount').value;
+        const newPrice = document.getElementById('editPrice').value;
+
+        if (!newAmount || !newPrice || newAmount <= 0 || newPrice <= 0) {
+          showError('Invalid amount or price');
+          return;
+        }
+
+        this.disabled = true;
+        this.innerHTML = '<div class="loading-spinner"></div>';
+
+        try {
+          // First, cancel the old offer
+          await cancelOffer(currentOfferId);
+
+          // Then, create a new one
+          const offer = await server.offers().offer(currentOfferId).call();
+          const isSell = offer.selling.asset_code === LAAM_TOKEN.code;
+
+          const selling = isSell ? LAAM_ASSET : StellarSdk.Asset.native();
+          const buying = isSell ? StellarSdk.Asset.native() : LAAM_ASSET;
+
+          const account = await server.loadAccount(currentKeypair.publicKey());
+          const transaction = new StellarSdk.TransactionBuilder(account, {
+            fee: StellarSdk.BASE_FEE,
+            networkPassphrase: StellarSdk.Networks.PUBLIC
+          })
+          .addOperation(StellarSdk.Operation.manageSellOffer({
+            selling: selling,
+            buying: buying,
+            amount: newAmount,
+            price: newPrice,
+            offerId: 0 // New offer
+          }))
+          .setTimeout(180)
+          .build();
+
+          transaction.sign(currentKeypair);
+          await server.submitTransaction(transaction);
+
+          showSuccess('Order updated successfully!');
+          closeEditModal();
+          closeMyOrdersModal();
+          await openMyOrdersModal(); // Refresh list
+
+        } catch (error) {
+          showError('Failed to update order: ' + error.message);
+        } finally {
+          this.disabled = false;
+          this.textContent = 'Save Changes';
+        }
+      });
+
+    });
+</script>
+</body>
+</html>
+
