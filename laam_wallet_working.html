@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laam wallet - Working Import/Create</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/10.4.0/stellar-sdk.min.js"></script>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0}
+  .card{background:#fff;padding:24px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.1);width:100%;max-width:480px}
+  h1{color:#1976d2}
+  .form-group{margin-bottom:14px}
+  .form-label{display:block;margin-bottom:6px;font-weight:600}
+  input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
+  button{padding:10px 14px;border:none;border-radius:8px;background:#1976d2;color:#fff;font-weight:600;cursor:pointer}
+  button.secondary{background:#6c757d}
+  .hidden{display:none}
+  .msg{padding:10px;margin-bottom:10px;border-radius:6px;display:none}
+  .success{background:#d4edda;color:#155724}
+  .error{background:#f8d7da;color:#721c24}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Laam Wallet</h1>
+
+    <div id="messages">
+      <div id="successMsg" class="msg success"></div>
+      <div id="errorMsg" class="msg error"></div>
+    </div>
+
+    <!-- Import / Create -->
+    <div id="initialView">
+      <div class="form-group">
+        <label class="form-label" for="secretKeyInput">Secret Key (S...)</label>
+        <input id="secretKeyInput" type="password" placeholder="SXXXXXXXXXXXXXXXXXXXX" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="savePasswordInput">Password to Save</label>
+        <input id="savePasswordInput" type="password" placeholder="Min 8 chars" />
+      </div>
+
+      <div class="form-group" style="display:flex;gap:10px">
+        <button id="importBtn">Import Wallet</button>
+        <button id="createBtn" class="secondary">Create New Wallet</button>
+      </div>
+    </div>
+
+    <!-- Wallet View -->
+    <div id="walletView" class="hidden">
+      <p><b>Public Key:</b> <span id="publicKey"></span></p>
+      <p><b>Secret Key:</b> <span id="secretKeyMasked">*********</span></p>
+      <button id="revealBtn">Reveal Secret</button>
+    </div>
+  </div>
+
+<script>
+  const importBtn = document.getElementById("importBtn");
+  const createBtn = document.getElementById("createBtn");
+  const secretInput = document.getElementById("secretKeyInput");
+  const passInput = document.getElementById("savePasswordInput");
+  const walletView = document.getElementById("walletView");
+  const initialView = document.getElementById("initialView");
+  const pubEl = document.getElementById("publicKey");
+  const secretMasked = document.getElementById("secretKeyMasked");
+  const revealBtn = document.getElementById("revealBtn");
+  const successMsg = document.getElementById("successMsg");
+  const errorMsg = document.getElementById("errorMsg");
+
+  let storedSecret = null;
+
+  function showMessage(el, msg){
+    successMsg.style.display = "none";
+    errorMsg.style.display = "none";
+    el.innerText = msg;
+    el.style.display = "block";
+  }
+
+  importBtn.addEventListener("click", ()=>{
+    const secret = secretInput.value.trim();
+    const password = passInput.value.trim();
+
+    if(!secret || !secret.startsWith("S")) return showMessage(errorMsg,"Enter valid secret key");
+    if(password.length < 8) return showMessage(errorMsg,"Password must be at least 8 chars");
+
+    try {
+      const kp = StellarSdk.Keypair.fromSecret(secret);
+      storedSecret = secret;
+      pubEl.innerText = kp.publicKey();
+      secretMasked.innerText = "*********";
+      initialView.classList.add("hidden");
+      walletView.classList.remove("hidden");
+      showMessage(successMsg,"Wallet imported successfully!");
+    } catch(e){
+      showMessage(errorMsg,"Invalid secret key");
+    }
+  });
+
+  createBtn.addEventListener("click", ()=>{
+    const kp = StellarSdk.Keypair.random();
+    storedSecret = kp.secret();
+    pubEl.innerText = kp.publicKey();
+    secretMasked.innerText = "*********";
+    initialView.classList.add("hidden");
+    walletView.classList.remove("hidden");
+    showMessage(successMsg,"New wallet created!");
+  });
+
+  revealBtn.addEventListener("click", ()=>{
+    if(secretMasked.innerText === "*********"){
+      secretMasked.innerText = storedSecret;
+    } else {
+      secretMasked.innerText = "*********";
+    }
+  });
+</script>
+</body>
+</html>
