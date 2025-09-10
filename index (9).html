@@ -2213,7 +2213,7 @@
           console.error('Generate account error:', error);
           showError('Failed to generate account: ' + error.message);
         }
-      });
+      }
       
       document.getElementById('unlockBtn').addEventListener('click', async function() {
         const password = document.getElementById('walletPassword').value;
