@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laam wallet</title>
+    <!-- Favicon & OG Image -->
+    <link rel="icon" type="image/png" href="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+    <meta property="og:image" content="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+    <meta property="og:title" content="Laam wallet - Modern Digital Currency">
+    <meta property="og:description" content="Laam Token is a digital asset built on Stellar with a fixed supply.">
+    <meta property="og:url" content="https://laam.online">
+    <meta property="og:type" content="website">
+<!-- Android PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1976d2">
+
+<!-- iPhone / iPad PWA -->
+<link rel="apple-touch-icon" href="https://i.ibb.co/r28SP1bN/20250802-225108.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Laam Wallet">
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Import wallet button
+  const importBtn = document.getElementById("importAndSaveBtn");
+  if(importBtn){
+    importBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const secret = document.getElementById("secretKeyInput").value.trim();
+      const password = document.getElementById("savePasswordInput").value.trim();
+
+      if (!secret.startsWith("S") || secret.length !== 56) {
+        alert("Invalid Stellar secret key");
+        return;
+      }
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters");
+        return;
+      }
+
+      try {
+        const keypair = StellarSdk.Keypair.fromSecret(secret);
+        const encrypted = CryptoJS.AES.encrypt(secret, password).toString();
+        localStorage.setItem("laam_wallet_key", encrypted);
+        localStorage.setItem("laam_wallet_public", keypair.publicKey());
+        alert("Wallet imported and saved!");
+        if(document.getElementById("initialView")) document.getElementById("initialView").classList.add("hidden");
+        if(document.getElementById("loggedInView")) document.getElementById("loggedInView").classList.remove("hidden");
+        if(document.getElementById("pubKeyDisplay")) document.getElementById("pubKeyDisplay").textContent = keypair.publicKey();
+      } catch (err) {
+        alert("Failed to import wallet: " + err.message);
+      }
+    });
+  }
+
+  // Generate new wallet button
+  const genBtn = document.getElementById("generateAccountBtn");
+  if(genBtn){
+    genBtn.addEventListener("click", () => {
+      const keypair = StellarSdk.Keypair.random();
+      if(document.getElementById("generatedSecretKey")) document.getElementById("generatedSecretKey").value = keypair.secret();
+      if(document.getElementById("generatedPublicKey")) document.getElementById("generatedPublicKey").value = keypair.publicKey();
+      if(document.getElementById("keyModal")) document.getElementById("keyModal").classList.remove("hidden");
+    });
+  }
+
+  // Modal close & use generated account
+  const useGenBtn = document.getElementById("useGeneratedBtn");
+  if(useGenBtn){
+    useGenBtn.addEventListener("click", () => {
+      const secret = document.getElementById("generatedSecretKey").value;
+      if(secret && document.getElementById("secretKeyInput")){
+        document.getElementById("secretKeyInput").value = secret;
+        alert("Secret placed into import form.");
+      }
+      if(document.getElementById("keyModal")) document.getElementById("keyModal").classList.add("hidden");
+    });
+  }
+
+  const closeModalBtn = document.getElementById("closeKeyModalBtn");
+  if(closeModalBtn){
+    closeModalBtn.addEventListener("click", () => {
+      if(document.getElementById("keyModal")) document.getElementById("keyModal").classList.add("hidden");
+    });
+  }
+});
+</script>
+
+</body>
+</html>
