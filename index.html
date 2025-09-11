@@ -2960,6 +2960,43 @@
         }
       });
     }
-  </script>
+      <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Import wallet button
+  document.getElementById("importAndSaveBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    const secret = document.getElementById("secretKeyInput").value.trim();
+    const password = document.getElementById("savePasswordInput").value.trim();
+
+    if (!secret.startsWith("S")) {
+      showError("Invalid Stellar secret key");
+      return;
+    }
+    if (password.length < 8) {
+      showError("Password must be at least 8 characters");
+      return;
+    }
+
+    try {
+      currentKeypair = StellarSdk.Keypair.fromSecret(secret);
+      const encrypted = encryptSecretKey(secret, password);
+      localStorage.setItem("laam_wallet_key", encrypted);
+      localStorage.setItem("laam_wallet_public", currentKeypair.publicKey());
+      showSuccess("Wallet imported and saved!");
+      document.getElementById("initialView").classList.add("hidden");
+      document.getElementById("loggedInView").classList.remove("hidden");
+    } catch (err) {
+      showError("Failed to import wallet: " + err.message);
+    }
+  });
+
+  // Generate new wallet button
+  document.getElementById("generateAccountBtn").addEventListener("click", () => {
+    generatedKeypair = StellarSdk.Keypair.random();
+    openKeyModal(generatedKeypair.secret(), generatedKeypair.publicKey());
+  });
+});
+</script>
+</script>
 </body>
 </html>
