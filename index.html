@@ -1811,7 +1811,20 @@
             usdcBalance = parseFloat(balance.balance);
           }
         });
+          // Example wallet balance data (si dhab ah waxaad kaga soo jiidan Stellar SDK)
+const balances = {
+  xlm: 6,
+  laam: 100,
+  usdc: 30
+};
 
+// Example prices (si dhab ah waxaad kaga soo jiidan API sida CoinGecko)
+const prices = {
+  xlm: 0.409,
+  laam: 0.056,
+  usdc: 1.00
+};
+      
         // XLM part
         document.getElementById('xlmBal').textContent = xlmBalance.toFixed(2);
         document.getElementById('xlmUsd').textContent = (xlmBalance * xlmPriceUSD).toFixed(2);
