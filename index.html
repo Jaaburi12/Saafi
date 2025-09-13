@@ -2356,82 +2356,6 @@ style="margin-top:10px;">
           this.disabled = false;
         }
       });
-    
- // Wizard nav
-    function nextStep(step) {
-      document.querySelectorAll(".wizard-step").forEach(s => s.classList.remove("active"));
-      document.getElementById("step" + step).classList.add("active");
-    }
-    function prevStep(step) {
-      document.querySelectorAll(".wizard-step").forEach(s => s.classList.remove("active"));
-      document.getElementById("step" + step).classList.add("active");
-    }
-
-    // Send transaction
-    document.getElementById("sendBtn").addEventListener("click", async function () {
-      const sendBtn = this;
-      const assetCode = document.getElementById("sendAsset").value;
-      const amount = document.getElementById("sendAmount").value;
-      const destination = document.getElementById("sendDest").value;
-      const memo = document.getElementById("sendMemo").value;
-
-      if (!amount || !destination) {
-        showError("❌ Please fill in all fields.");
-        return;
-      }
-      if (!currentKeypair) {
-        showError("❌ Wallet not loaded.");
-        return;
-      }
-
-      sendBtn.textContent = "Sending...";
-      sendBtn.disabled = true;
-
-      try {
-        const account = await server.loadAccount(currentKeypair.publicKey());
-
-        let assetObj;
-        if (assetCode === "XLM") assetObj = StellarSdk.Asset.native();
-        if (assetCode === "LAAM") assetObj = LAAM_ASSET;
-        if (assetCode === "USDC") assetObj = USDC_ASSET;
-
-        const txBuilder = new StellarSdk.TransactionBuilder(account, {
-          fee: StellarSdk.BASE_FEE,
-          networkPassphrase: StellarSdk.Networks.PUBLIC
-        });
-
-        if (memo) txBuilder.addMemo(StellarSdk.Memo.text(memo));
-
-        const tx = txBuilder
-          .addOperation(StellarSdk.Operation.payment({
-            destination: destination,
-            asset: assetObj,
-            amount: amount
-          }))
-          .setTimeout(180)
-          .build();
-
-        tx.sign(currentKeypair);
-
-        const result = await server.submitTransaction(tx);
-        showSuccess("✅ Transaction sent successfully! Hash: " + result.hash);
-
-        document.getElementById("sendAmount").value = "";
-        document.getElementById("sendDest").value = "";
-        document.getElementById("sendMemo").value = "";
-        nextStep(1);
-
-      } catch (err) {
-        console.error(err);
-        showError("❌ Failed: " + err.message);
-      } finally {
-        sendBtn.textContent = "Send Now";
-        sendBtn.disabled = false;
-      }
-    });
-
-    function showError(msg){ document.getElementById("message").style.color="red"; document.getElementById("message").textContent=msg; }
-    function showSuccess(msg){ document.getElementById("message").style.color="green"; document.getElementById("message").textContent=msg; }
         
       // Event listener for the Receive button
       document.getElementById('btnReceive').addEventListener('click', function() {
@@ -2981,6 +2905,98 @@ style="margin-top:10px;">
         }
       });
     }
+   
+    const server = new StellarSdk.Server("https://horizon.stellar.org");
+
+    // Your assets
+    const LAAM_ASSET = new StellarSdk.Asset("Laam", "GAL4ECDAXNBMJYFCWIJ32HKVIRLCNEXY664CAZYI3EINQWPLXTMEPR64");
+    const USDC_ASSET = new StellarSdk.Asset("USDC", "GA5ZSEJYB37JRC5AVCIA5M4HKZ6ZK2JYZZIRMTDRVDDF4K33ARMP7V2P");
+
+    // Example: load your wallet keypair here
+    let currentKeypair = null; 
+    try {
+      // ⚠️ Tijaabo: geli secret key-gaaga si aad u tijaabiso (ha ku darin production!)
+      // currentKeypair = StellarSdk.Keypair.fromSecret("SXXXXXXXXXXXXXXXXXXXXXXXX");
+    } catch(e) {
+      console.log("Wallet not loaded yet.");
+    }
+
+    // Wizard nav
+    function nextStep(step) {
+      document.querySelectorAll(".wizard-step").forEach(s => s.classList.remove("active"));
+      document.getElementById("step" + step).classList.add("active");
+    }
+    function prevStep(step) {
+      document.querySelectorAll(".wizard-step").forEach(s => s.classList.remove("active"));
+      document.getElementById("step" + step).classList.add("active");
+    }
+
+    // Send transaction
+    document.getElementById("sendBtn").addEventListener("click", async function () {
+      const sendBtn = this;
+      const assetCode = document.getElementById("sendAsset").value;
+      const amount = document.getElementById("sendAmount").value;
+      const destination = document.getElementById("sendDest").value;
+      const memo = document.getElementById("sendMemo").value;
+
+      if (!amount || !destination) {
+        showError("❌ Please fill in all fields.");
+        return;
+      }
+      if (!currentKeypair) {
+        showError("❌ Wallet not loaded.");
+        return;
+      }
+
+      sendBtn.textContent = "Sending...";
+      sendBtn.disabled = true;
+
+      try {
+        const account = await server.loadAccount(currentKeypair.publicKey());
+
+        let assetObj;
+        if (assetCode === "XLM") assetObj = StellarSdk.Asset.native();
+        if (assetCode === "LAAM") assetObj = LAAM_ASSET;
+        if (assetCode === "USDC") assetObj = USDC_ASSET;
+
+        const txBuilder = new StellarSdk.TransactionBuilder(account, {
+          fee: StellarSdk.BASE_FEE,
+          networkPassphrase: StellarSdk.Networks.PUBLIC
+        });
+
+        if (memo) txBuilder.addMemo(StellarSdk.Memo.text(memo));
+
+        const tx = txBuilder
+          .addOperation(StellarSdk.Operation.payment({
+            destination: destination,
+            asset: assetObj,
+            amount: amount
+          }))
+          .setTimeout(180)
+          .build();
+
+        tx.sign(currentKeypair);
+
+        const result = await server.submitTransaction(tx);
+        showSuccess("✅ Transaction sent successfully! Hash: " + result.hash);
+
+        document.getElementById("sendAmount").value = "";
+        document.getElementById("sendDest").value = "";
+        document.getElementById("sendMemo").value = "";
+        nextStep(1);
+
+      } catch (err) {
+        console.error(err);
+        showError("❌ Failed: " + err.message);
+      } finally {
+        sendBtn.textContent = "Send Now";
+        sendBtn.disabled = false;
+      }
+    });
+
+    function showError(msg){ document.getElementById("message").style.color="red"; document.getElementById("message").textContent=msg; }
+    function showSuccess(msg){ document.getElementById("message").style.color="green"; document.getElementById("message").textContent=msg; }
+  </script>     
   </script>
 </body>
 </html>
