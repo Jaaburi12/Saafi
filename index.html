@@ -938,25 +938,61 @@
           </div>
         </div>
         
-        <!-- Asset Balances -->
-        <div class="assets-grid">
-          <div class="asset-item">
-            <div class="asset-name">XLM</div>
-            <div class="asset-balance"><span id="xlmBal">0</span></div>
-            <div class="asset-price">$<span id="xlmUsd">0</span> ($<span id="xlmPrice">0.409</span>/XLM)</div>
+        <!-- Tokens list styled like the provided image -->
+    <div style="background:linear-gradient(180deg,#ffffff,rgba(255,255,255,0.92)); padding:12px; border-radius:14px; border:1px solid rgba(0,0,0,0.04); box-shadow:0 8px 30px rgba(0,0,0,0.04); margin-top:8px;">
+      <div style="display:flex; flex-direction:column; gap:12px; align-items:stretch;">
+        <!-- Token row: XLM -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 10px; border-radius:12px; background:transparent;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#dbeafe,#bfdbfe); box-shadow:0 6px 14px rgba(2,6,23,0.06);">
+              <img src="https://res.coinpaper.com/coinpaper/stellar_xlm_logo_07021d63c0.png" alt="XLM" style="width:28px;height:28px;">
+            </div>
+            <div style="text-align:left;">
+              <div style="font-weight:800;">XLM</div>
+              <div style="font-size:0.85rem; color:#6b7280;">$<span id="xlmPriceSmall">0.409</span> / XLM</div>
+            </div>
           </div>
-          <div class="asset-item">
-            <div class="asset-name">Laam</div>
-            <div class="asset-balance"><span id="laamBal">0</span></div>
-            <div class="asset-price">$<span id="laamUsd">0</span> ($<span id="laamPrice">0.056</span>/Laam)</div>
+          <div style="text-align:right;">
+            <div style="font-weight:900; font-size:1.05rem;">0</div>
+            <div style="font-size:0.85rem; color:#6b7280;">$<span id="xlmUsd">0</span></div>
           </div>
-          <div class="asset-item">
-            <div class="asset-name">USDC</div>
-            <div class="asset-balance"><span id="usdcBal">0</span></div>
-            <div class="asset-price">$<span id="usdcUsd">0</span> ($<span id="usdcPrice">1.00</span>/USDC)</div>
+        </div>
+
+        <!-- Token row: LAAM -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 10px; border-radius:12px; background:transparent;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#e9d5ff,#d6bbff); box-shadow:0 6px 14px rgba(2,6,23,0.06);">
+              <img src="https://i.ibb.co/r28SP1bN/20250802-225108.png" alt="Laam" style="width:28px;height:28px;">
+            </div>
+            <div style="text-align:left;">
+              <div style="font-weight:800;">LAAM</div>
+              <div style="font-size:0.85rem; color:#6b7280;">$<span id="laamPriceSmall">0.056</span> / Laam</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900; font-size:1.05rem;">0</div>
+            <div style="font-size:0.85rem; color:#6b7280;">$<span id="laamUsd">0</span></div>
+          </div>
+        </div>
+
+        <!-- Token row: USDC -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 10px; border-radius:12px; background:transparent;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#d1fae5,#a7f3d0); box-shadow:0 6px 14px rgba(2,6,23,0.06);">
+              <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=024" alt="USDC" style="width:28px;height:28px;border-radius:6px;">
+            </div>
+            <div style="text-align:left;">
+              <div style="font-weight:800;">USDC</div>
+              <div style="font-size:0.85rem; color:#6b7280;">$1.00 / USDC</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900; font-size:1.05rem;">0</div>
+            <div style="font-size:0.85rem; color:#6b7280;">$<span id="usdcUsd">0</span></div>
           </div>
         </div>
       </div>
+    </div>
 
       <!-- SEND FORM -->
       <div id="sendForm" class="send-wrap">
