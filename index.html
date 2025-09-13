@@ -1757,63 +1757,36 @@
         return;
       }
 
-      try {
-        console.log('Loading account data...');
-        const account = await server.loadAccount(currentKeypair.publicKey());
-        
-        let xlmBalance = 0;
-        let laamBalance = 0;
-        let usdcBalance = 0;
-
-        account.balances.forEach(balance => {
-          if (balance.asset_type === 'native') {
-            xlmBalance = parseFloat(balance.balance);
-          } else if (
-            balance.asset_code === LAAM_TOKEN.code &&
-            balance.asset_issuer === LAAM_TOKEN.issuer
-          ) {
-            laamBalance = parseFloat(balance.balance);
-          } else if (
-            balance.asset_code === USDC_TOKEN.code &&
-            balance.asset_issuer === USDC_TOKEN.issuer
-          ) {
-            usdcBalance = parseFloat(balance.balance);
-          }
-        });
-          // Example wallet balance data (si dhab ah waxaad kaga soo jiidan Stellar SDK)
-const balances = {
-  xlm: 6,
-  laam: 100,
-  usdc: 30
-};
-
-// Example prices (si dhab ah waxaad kaga soo jiidan API sida CoinGecko)
-const prices = {
-  xlm: 0.409,
-  laam: 0.056,
-  usdc: 1.00
-};
       
-        // XLM part
-        document.getElementById('xlmBal').textContent = xlmBalance.toFixed(2);
-        document.getElementById('xlmUsd').textContent = (xlmBalance * xlmPriceUSD).toFixed(2);
-        document.getElementById('xlmPrice').textContent = xlmPriceUSD.toFixed(3);
+        async function loadBalances(pubKey) {
+  try {
+    const server = new StellarSdk.Server("https://horizon.stellar.org");
+    const account = await server.loadAccount(pubKey);
 
-        // Laam part - USD value of Laam token
-        const bestSellOfferXLM = await getBestSellOfferPrice();
-        const laamPriceUSD = bestSellOfferXLM * xlmPriceUSD;
-        
-        LAAM_TOKEN.currentPrice = laamPriceUSD;
+    let xlm = 0, laam = 0, usdc = 0;
 
-        document.getElementById('laamBal').textContent = laamBalance.toFixed(2);
-        document.getElementById('laamUsd').textContent = (laamBalance * laamPriceUSD).toFixed(2);
-        document.getElementById('laamPrice').textContent = laamPriceUSD.toFixed(6);
+    account.balances.forEach(b => {
+      if (b.asset_type === "native") {
+        xlm = parseFloat(b.balance);
+      } else if (b.asset_code === "LAAM" && b.asset_issuer === "GAL4ECDAXNBMJYFCWIJ32HKVIRLCNEXY664CAZYI3EINQWPLXTMEPR64") {
+        laam = parseFloat(b.balance);
+      } else if (b.asset_code === "USDC") {
+        usdc = parseFloat(b.balance);
+      }
+    });
 
-        // USDC part
-        document.getElementById('usdcBal').textContent = usdcBalance.toFixed(2);
-        document.getElementById('usdcUsd').textContent = usdcBalance.toFixed(2); // USDC is 1:1 with USD
-        document.getElementById('usdcPrice').textContent = "1.00";
-        
+    document.getElementById("xlmBal").textContent = xlm.toFixed(2);
+    document.getElementById("xlmUsd").textContent = (xlm * 0.409).toFixed(2);
+
+    document.getElementById("laamBal").textContent = laam.toFixed(2);
+    document.getElementById("laamUsd").textContent = (laam * 0.056).toFixed(2);
+
+    document.getElementById("usdcBal").textContent = usdc.toFixed(2);
+    document.getElementById("usdcUsd").textContent = usdc.toFixed(2);
+  } catch (err) {
+    console.error("Error loading balances:", err);
+  }
+     }
         updateTotalAssets();
         
         console.log('Balance display updated successfully');
