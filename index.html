@@ -764,38 +764,7 @@
     font-weight: 600;
   }
   
-  .assets-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
-  }
   
-  .asset-item {
-    text-align: center;
-    padding: 15px 10px;
-    background: #f8f9fa;
-    borderRadius: 12px;
-    border: 1px solid #e9ecef;
-  }
-  
-  .asset-name {
-    font-weight: 600;
-    margin-bottom: 5px;
-    color: #333;
-  }
-  
-  .asset-balance {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #1976d2;
-  }
-  
-  .asset-price {
-    font-size: 12px;
-    color: #666;
-  }
   
   .custom-alert {
     position: fixed;
@@ -803,7 +772,52 @@
     left: 50%;
     transform: translateX(-50%);
     background: #28a745;
-    color: white;
+    color: white;.token-list {
+  margin-top: 20px;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  background: #f8f9fa;
+  overflow: hidden;
+}
+
+.token-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.token-row:last-child {
+  border-bottom: none;
+}
+
+.token-left, .token-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.token-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.token-balance {
+  font-size: 13px;
+  color: #1976d2;
+}
+
+.token-price {
+  font-size: 12px;
+  color: #555;
+}
+
+.token-total {
+  font-size: 13px;
+  font-weight: 600;
+  color: #28a745;
+}
     padding: 14px 22px;
     border-radius: 12px;
     font-weight: 600;
@@ -939,24 +953,40 @@
         </div>
         
         <!-- Asset Balances -->
-        <div class="assets-grid">
-          <div class="asset-item">
-            <div class="asset-name">XLM</div>
-            <div class="asset-balance"><span id="xlmBal">0</span></div>
-            <div class="asset-price">$<span id="xlmUsd">0</span> ($<span id="xlmPrice">0.409</span>/XLM)</div>
-          </div>
-          <div class="asset-item">
-            <div class="asset-name">Laam</div>
-            <div class="asset-balance"><span id="laamBal">0</span></div>
-            <div class="asset-price">$<span id="laamUsd">0</span> ($<span id="laamPrice">0.056</span>/Laam)</div>
-          </div>
-          <div class="asset-item">
-            <div class="asset-name">USDC</div>
-            <div class="asset-balance"><span id="usdcBal">0</span></div>
-            <div class="asset-price">$<span id="usdcUsd">0</span> ($<span id="usdcPrice">1.00</span>/USDC)</div>
-          </div>
-        </div>
-      </div>
+        <div class="token-list">
+  <div class="token-row">
+    <div class="token-left">
+      <span class="token-name">XLM</span>
+      <span class="token-balance">0</span>
+    </div>
+    <div class="token-right">
+      <span class="token-price">$0.409</span>
+      <span class="token-total">$0</span>
+    </div>
+  </div>
+
+  <div class="token-row">
+    <div class="token-left">
+      <span class="token-name">LAAM</span>
+      <span class="token-balance">0</span>
+    </div>
+    <div class="token-right">
+      <span class="token-price">$0.056</span>
+      <span class="token-total">$0</span>
+    </div>
+  </div>
+
+  <div class="token-row">
+    <div class="token-left">
+      <span class="token-name">USDC</span>
+      <span class="token-balance">0</span>
+    </div>
+    <div class="token-right">
+      <span class="token-price">$1.00</span>
+      <span class="token-total">$0</span>
+    </div>
+  </div>
+</div>
 
       <!-- SEND FORM -->
       <div id="sendForm" class="send-wrap">
