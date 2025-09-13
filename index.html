@@ -710,61 +710,60 @@
     gap: 12px;
     margin-bottom: 15px;
   }
-  
   .action-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 15px 10px;
-    border-radius: 12px;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .action-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  .action-button.send {
-    background: #f8f9fa;
-    color: #212529;
-  }
-  
-  .action-button.receive {
-    background: #28a745;
-    color: white;
-  }
-  
-  .action-button.swap {
-    background: #0052cc;
-    color: white;
-  }
-  
-  .action-button.trustline {
-    background: #6c757d;
-    color: white;
-  }
-  
-  .action-button.lock {
-    background: #dc3545;
-    color: white;
-  }
-  
-  .action-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
-  }
-  
-  .action-text {
-    font-size: 14px;
-    font-weight: 600;
-  }
-  
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 70px;   /* yar */
+  height: 70px;  /* yar */
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.action-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.action-button.send {
+  background: #1976d2; /* buluug */
+  color: white;
+}
+
+.action-button.receive {
+  background: #28a745; /* cagaar */
+  color: white;
+}
+
+.action-button.swap {
+  background: #6f42c1; /* purple */
+  color: white;
+}
+
+.action-button.trustline {
+  background: #ffc107; /* huruud */
+  color: #212529;
+}
+
+.action-button.lock {
+  background: #dc3545; /* casaan */
+  color: white;
+}
+
+.action-icon {
+  font-size: 18px; /* yareeyay */
+  margin-bottom: 4px;
+}
+
+.action-text {
+  font-size: 12px;
+  font-weight: 600;
+      }
+
   
   .custom-alert {
     position: fixed;
@@ -926,31 +925,28 @@
         </div>
         
         <!-- Action Buttons -->
-        <div class="action-buttons">
-          <div class="action-button send" id="btnSendToggle">
-            <div class="action-icon">→</div>
-            <div class="action-text">Send</div>
-          </div>
-          <div class="action-button receive" id="btnReceive">
-            <div class="action-icon">←</div>
-            <div class="action-text">Receive</div>
-          </div>
-        </div>
-        
-        <div class="action-buttons">
-          <div class="action-button swap" id="btnSwap">
-            <div class="action-icon">⇄</div>
-            <div class="action-text">Swap</div>
-          </div>
-          <div class="action-button trustline" id="addTrustlineBtn">
-            <div class="action-icon">+</div>
-            <div class="action-text">Add Trustline</div>
-          </div>
-          <div class="action-button lock" id="logoutBtn">
-            <div class="action-icon">🔒</div>
-            <div class="action-text">Lock</div>
-          </div>
-        </div>
+        <div class="actions">
+  <button class="action-button send">
+    <div class="action-icon">📤</div>
+    <div class="action-text">Send</div>
+  </button>
+  <button class="action-button receive">
+    <div class="action-icon">📥</div>
+    <div class="action-text">Receive</div>
+  </button>
+  <button class="action-button swap">
+    <div class="action-icon">🔄</div>
+    <div class="action-text">Swap</div>
+  </button>
+  <button class="action-button trustline">
+    <div class="action-icon">➕</div>
+    <div class="action-text">Trustline</div>
+  </button>
+  <button class="action-button lock">
+    <div class="action-icon">🔒</div>
+    <div class="action-text">Lock</div>
+  </button>
+    </div>
         
         <!-- Asset Balances -->
         <div class="token-list">
