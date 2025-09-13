@@ -892,13 +892,69 @@
           <div class="total-value">$<span id="totalAssets">0</span></div>
         </div>
         
-        <!-- Send button -->
 <!-- Button to open wizard -->
 <button onclick="openSendWizard()" 
   style="background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
   Send
-</button></div>
-          </div>
+</button>  
+      !-- Wizard -->
+<div id="sendWizard" class="send-wrap">
+  <!-- Step 1: Form -->
+  <div id="step1">
+    <h3>Send Token</h3>
+    <div class="send-row">
+      <div>
+        <label>Asset</label>
+        <select id="sendAsset" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+          <option value="XLM">XLM</option>
+          <option value="LAAM">LAAM</option>
+          <option value="USDC">USDC</option>
+        </select>
+      </div>
+      <div>
+        <label>Amount</label>
+        <input id="sendAmount" type="number" placeholder="0.00"
+          style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+      </div>
+    </div>
+    <div class="send-row" style="margin-top:10px;">
+      <div style="grid-column: span 2;">
+        <label>Destination Address</label>
+        <input id="sendDest" type="text" placeholder="Enter Stellar address"
+          style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+      </div>
+    </div>
+    <div
+style="margin-top:10px;">
+      <label>Memo (optional)</label>
+      <input id="sendMemo" type="text" placeholder="Memo"
+        style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+    </div>
+    <button onclick="nextStep()" 
+      style="margin-top:12px;background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+      Next
+    </button>
+  </div>
+
+  <!-- Step 2: Confirm -->
+  <div id="step2" style="display:none;">
+    <h3>Confirm Transaction</h3>
+    <p><strong>Asset:</strong> <span id="confirmAsset"></span></p>
+    <p><strong>Amount:</strong> <span id="confirmAmount"></span></p>
+    <p><strong>Destination:</strong> <span id="confirmDest"></span></p>
+    <p><strong>Memo:</strong> <span id="confirmMemo"></span></p>
+    <div style="margin-top:12px;display:flex;gap:10px;">
+      <button onclick="backStep()" 
+        style="flex:1;background:#6c757d;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+        Back
+      </button>
+      <button id="confirmSendBtn" onclick="sendTransaction()" 
+        style="flex:1;background:#28a745;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+        Send Now
+      </button>
+    </div>
+  </div>
+</div>
           <div class="action-button receive" id="btnReceive">
             <div class="action-icon">←</div>
             <div class="action-text">Receive</div>
@@ -976,64 +1032,6 @@
       </div>
     </div>
 
-      !-- Wizard -->
-<div id="sendWizard" class="send-wrap">
-  <!-- Step 1: Form -->
-  <div id="step1">
-    <h3>Send Token</h3>
-    <div class="send-row">
-      <div>
-        <label>Asset</label>
-        <select id="sendAsset" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-          <option value="XLM">XLM</option>
-          <option value="LAAM">LAAM</option>
-          <option value="USDC">USDC</option>
-        </select>
-      </div>
-      <div>
-        <label>Amount</label>
-        <input id="sendAmount" type="number" placeholder="0.00"
-          style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-      </div>
-    </div>
-    <div class="send-row" style="margin-top:10px;">
-      <div style="grid-column: span 2;">
-        <label>Destination Address</label>
-        <input id="sendDest" type="text" placeholder="Enter Stellar address"
-          style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-      </div>
-    </div>
-    <div
-style="margin-top:10px;">
-      <label>Memo (optional)</label>
-      <input id="sendMemo" type="text" placeholder="Memo"
-        style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-    </div>
-    <button onclick="nextStep()" 
-      style="margin-top:12px;background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
-      Next
-    </button>
-  </div>
-
-  <!-- Step 2: Confirm -->
-  <div id="step2" style="display:none;">
-    <h3>Confirm Transaction</h3>
-    <p><strong>Asset:</strong> <span id="confirmAsset"></span></p>
-    <p><strong>Amount:</strong> <span id="confirmAmount"></span></p>
-    <p><strong>Destination:</strong> <span id="confirmDest"></span></p>
-    <p><strong>Memo:</strong> <span id="confirmMemo"></span></p>
-    <div style="margin-top:12px;display:flex;gap:10px;">
-      <button onclick="backStep()" 
-        style="flex:1;background:#6c757d;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
-        Back
-      </button>
-      <button id="confirmSendBtn" onclick="sendTransaction()" 
-        style="flex:1;background:#28a745;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
-        Send Now
-      </button>
-    </div>
-  </div>
-</div>
       <!-- Enhanced Trade Section -->
       <div class="card trade-card">
         <div class="trade-header">
