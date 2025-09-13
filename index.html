@@ -2356,18 +2356,8 @@ style="margin-top:10px;">
           this.disabled = false;
         }
       });
-    src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/11.1.1/stellar-sdk.min.js"></script>
-<script>
-const server = new StellarSdk.Server("https://horizon.stellar.org");
-
-// Qeex assets
-const LAAM_ASSET = new StellarSdk.Asset("Laam","GAL4ECDAXNBMJYFCWIJ32HKVIRLCNEXY664CAZYI3EINQWPLXTMEPR64");
-const USDC_ASSET = new StellarSdk.Asset("USDC","GA5ZSEJYB37JRC5AV3EVWJEBFZVKVDJYZFLWB6FEUJDXVV7JHQK3Z7UX");
-
-// Tusaale keypair (waa in user uu ku import gareeyo)
-let currentKeypair = null; // ku xidh wallet logic kaaga  
-            
-function openSendWizard(){
+    
+{
   document.getElementById("sendWizard").style.display = "block";
 }
 
