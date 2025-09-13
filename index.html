@@ -1777,6 +1777,11 @@
 
     document.getElementById("usdcBal").textContent = usdc.toFixed(2);
     document.getElementById("usdcUsd").textContent = usdc.toFixed(2);
+   
+      updateTotalAssets();
+      
+     console.log('Balance display updated successfully');
+
   } catch (err) {
     console.error("Error loading balances:", err);
   }
