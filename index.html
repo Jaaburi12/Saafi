@@ -1751,13 +1751,7 @@
     }
 
     // Update balance display function
-    async function updateBalanceDisplay() {
-      if (!currentKeypair || !server) {
-        console.log('No keypair or server available');
-        return;
-      }
-
-      
+     
         async function loadBalances(pubKey) {
   try {
     const server = new StellarSdk.Server("https://horizon.stellar.org");
@@ -1786,16 +1780,8 @@
   } catch (err) {
     console.error("Error loading balances:", err);
   }
-     }
-        updateTotalAssets();
+ }
         
-        console.log('Balance display updated successfully');
-        
-      } catch (error) {
-        console.error('Error updating balance display:', error);
-        showError('Failed to load account balance: ' + error.message);
-      }
-    }
 
     // Load wallet function
     async function loadWallet() {
