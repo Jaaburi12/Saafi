@@ -2357,102 +2357,81 @@ style="margin-top:10px;">
         }
       });
     
-function openSendWizard(){
-  document.getElementById("sendWizard").style.display = "block";
-}
-
-function nextStep(){
-  const asset = document.getElementById("sendAsset").value;
-  const amount = document.getElementById("sendAmount").value;
-  const dest = document.getElementById("sendDest").value;
-  const memo = document.getElementById("sendMemo").value;
-
-  if(!amount || !dest){
-    alert("Please fill in destination and amount.");
-    return;
-  }
-
-  document.getElementById("confirmAsset").textContent = asset;
-  document.getElementById("confirmAmount").textContent = amount;
-  document.getElementById("confirmDest").textContent = dest;
-  document.getElementById("confirmMemo").textContent = memo || "-";
-
-  document.getElementById("step1").style.display="none";
-  document.getElementById("step2").style.display="block";
-}
-
-function backStep(){
-  document.getElementById("step2").style.display="none";
-  document.getElementById("step1").style.display="block";
-}
-
-async function sendTransaction(){
-  const btn = document.getElementById("confirmSendBtn");
-  btn.textContent="Sending...";
-  btn.disabled=true;
-
-  const asset = document.getElementById("sendAsset").value;
-  const amount = document.getElementById("sendAmount").value;
-  const destination = document.getElementById("sendDest").value;
-  const memo = document.getElementById("sendMemo").value;
-
-  try {
-    if(!currentKeypair){
-      alert("Wallet not loaded.");
-      return;
+ // Wizard nav
+    function nextStep(step) {
+      document.querySelectorAll(".wizard-step").forEach(s => s.classList.remove("active"));
+      document.getElementById("step" + step).classList.add("active");
     }
-    const account = await server.loadAccount(currentKeypair.publicKey());
-
-    let operation;
-    if(asset==="XLM"){
-      operation = StellarSdk.Operation.payment({
-        destination,
-        asset:StellarSdk.Asset.native(),
-        amount
-      });
-    } else if(asset==="LAAM"){
-      operation = StellarSdk.Operation.payment({
-        destination,
-        asset:LAAM_ASSET,
-        amount
-      });
-    } else if(asset==="USDC"){
-      operation = StellarSdk.Operation.payment({
-        destination,
-        asset:USDC_ASSET,
-        amount
-      });
+    function prevStep(step) {
+      document.querySelectorAll(".wizard-step").forEach(s => s.classList.remove("active"));
+      document.getElementById("step" + step).classList.add("active");
     }
 
-    const txBuilder = new StellarSdk.TransactionBuilder(account,{
-      fee:StellarSdk.BASE_FEE,
-      networkPassphrase:StellarSdk.Networks.PUBLIC
+    // Send transaction
+    document.getElementById("sendBtn").addEventListener("click", async function () {
+      const sendBtn = this;
+      const assetCode = document.getElementById("sendAsset").value;
+      const amount = document.getElementById("sendAmount").value;
+      const destination = document.getElementById("sendDest").value;
+      const memo = document.getElementById("sendMemo").value;
+
+      if (!amount || !destination) {
+        showError("❌ Please fill in all fields.");
+        return;
+      }
+      if (!currentKeypair) {
+        showError("❌ Wallet not loaded.");
+        return;
+      }
+
+      sendBtn.textContent = "Sending...";
+      sendBtn.disabled = true;
+
+      try {
+        const account = await server.loadAccount(currentKeypair.publicKey());
+
+        let assetObj;
+        if (assetCode === "XLM") assetObj = StellarSdk.Asset.native();
+        if (assetCode === "LAAM") assetObj = LAAM_ASSET;
+        if (assetCode === "USDC") assetObj = USDC_ASSET;
+
+        const txBuilder = new StellarSdk.TransactionBuilder(account, {
+          fee: StellarSdk.BASE_FEE,
+          networkPassphrase: StellarSdk.Networks.PUBLIC
+        });
+
+        if (memo) txBuilder.addMemo(StellarSdk.Memo.text(memo));
+
+        const tx = txBuilder
+          .addOperation(StellarSdk.Operation.payment({
+            destination: destination,
+            asset: assetObj,
+            amount: amount
+          }))
+          .setTimeout(180)
+          .build();
+
+        tx.sign(currentKeypair);
+
+        const result = await server.submitTransaction(tx);
+        showSuccess("✅ Transaction sent successfully! Hash: " + result.hash);
+
+        document.getElementById("sendAmount").value = "";
+        document.getElementById("sendDest").value = "";
+        document.getElementById("sendMemo").value = "";
+        nextStep(1);
+
+      } catch (err) {
+        console.error(err);
+        showError("❌ Failed: " + err.message);
+      } finally {
+        sendBtn.textContent = "Send Now";
+        sendBtn.disabled = false;
+      }
     });
 
-    if(memo){
-      txBuilder.addMemo(StellarSdk.Memo.text(memo));
-    }
-
-    const tx = txBuilder.addOperation(operation).setTimeout(180).build();
-    tx.sign(currentKeypair);
-
-    const result = await server.submitTransaction(tx);
-    alert("✅ Transaction successful! Hash: " + result.hash);
-
-    // Reset
-    document.getElementById("sendWizard").style.display="none";
-    document.getElementById("sendAmount").value="";
-    document.getElementById("sendDest").value="";
-    document.getElementById("sendMemo").value="";
-
-  } catch(err){
-    console.error(err);
-    alert("❌ Transaction failed: " + err.message);
-  } finally {
-    btn.textContent="Send Now";
-    btn.disabled=false;
-  }
-}
+    function showError(msg){ document.getElementById("message").style.color="red"; document.getElementById("message").textContent=msg; }
+    function showSuccess(msg){ document.getElementById("message").style.color="green"; document.getElementById("message").textContent=msg; }
         
       // Event listener for the Receive button
       document.getElementById('btnReceive').addEventListener('click', function() {
