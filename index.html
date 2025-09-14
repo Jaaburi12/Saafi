@@ -891,59 +891,76 @@
           <div class="total-label">Total assets</div>
           <div class="total-value">$<span id="totalAssets">0</span></div>
         </div>
-        
-<!-- Button to open wizard -->
+       <!-- Button to open wizard -->
 <button onclick="openSendWizard()" 
   style="background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
   Send
 </button>  
-<div id="sendWizard" class="send-wrap">
-  <!-- Step 1: Form -->
+
+<div id="sendWizard" class="send-wrap" style="display:none;">
+  <!-- Step 1: Choose Asset -->
   <div id="step1">
-    <h3>Send Token</h3>
-    <div class="send-row">
-      <div>
-        <label>Asset</label>
-        <select id="sendAsset" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-          <option value="XLM">XLM</option>
-          <option value="LAAM">LAAM</option>
-          <option value="USDC">USDC</option>
-        </select>
-      </div>
-      <div>
-        <label>Amount</label>
-        <input id="sendAmount" type="number" placeholder="0.00"
-          style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-      </div>
-    </div>
-    <div class="send-row" style="margin-top:10px;">
-      <div style="grid-column: span 2;">
-        <label>Destination Address</label>
-        <input id="sendDest" type="text" placeholder="Enter Stellar address"
-          style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-      </div>
-    </div>
-    <div
-style="margin-top:10px;">
-      <label>Memo (optional)</label>
-      <input id="sendMemo" type="text" placeholder="Memo"
-        style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
-    </div>
-    <button onclick="nextStep()" 
+    <h3>Step 1: Choose Asset</h3>
+    <label>Select Token</label>
+    <select id="sendAsset" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+      <option value="XLM">XLM</option>
+      <option value="LAAM">LAAM</option>
+      <option value="USDC">USDC</option>
+    </select>
+    <button onclick="nextStep(2)" 
       style="margin-top:12px;background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
       Next
     </button>
   </div>
 
-  <!-- Step 2: Confirm -->
+  <!-- Step 2: Enter Amount -->
   <div id="step2" style="display:none;">
-    <h3>Confirm Transaction</h3>
+    <h3>Step 2: Enter Amount</h3>
+    <label>Amount</label>
+    <input id="sendAmount" type="number" placeholder="0.00"
+      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+    <div style="margin-top:12px;display:flex;gap:10px;">
+      <button onclick="backStep(1)" 
+        style="flex:1;background:#6c757d;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+        Back
+      </button>
+      <button onclick="nextStep(3)" 
+        style="flex:1;background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3: Enter Destination -->
+  <div id="step3" style="display:none;">
+    <h3>Step 3: Destination</h3>
+    <label>Destination Address</label>
+    <input id="sendDest" type="text" placeholder="Enter Stellar address"
+      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:10px;">
+    <label>Memo (optional)</label>
+    <input id="sendMemo" type="text" placeholder="Memo"
+      style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;">
+    <div style="margin-top:12px;display:flex;gap:10px;">
+      <button onclick="backStep(2)" 
+        style="flex:1;background:#6c757d;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+        Back
+      </button>
+      <button onclick="nextStep(4)" 
+        style="flex:1;background:#1976d2;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 4: Confirm -->
+  <div id="step4" style="display:none;">
+    <h3>Step 4: Confirm Transaction</h3>
     <p><strong>Asset:</strong> <span id="confirmAsset"></span></p>
     <p><strong>Amount:</strong> <span id="confirmAmount"></span></p>
     <p><strong>Destination:</strong> <span id="confirmDest"></span></p>
     <p><strong>Memo:</strong> <span id="confirmMemo"></span></p>
     <div style="margin-top:12px;display:flex;gap:10px;">
-      <button onclick="backStep()" 
+      <button onclick="backStep(3)" 
         style="flex:1;background:#6c757d;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
         Back
       </button>
@@ -953,7 +970,8 @@ style="margin-top:10px;">
       </button>
     </div>
   </div>
-</div>
+  </div> 
+
           <div class="action-button receive" id="btnReceive">
             <div class="action-icon">←</div>
             <div class="action-text">Receive</div>
@@ -2906,42 +2924,34 @@ style="margin-top:10px;">
       });
     }
 
-  // Open wizard
   function openSendWizard() {
     document.getElementById("sendWizard").style.display = "block";
-    document.getElementById("step1").style.display = "block";
-    document.getElementById("step2").style.display = "none";
+    showStep(1);
   }
 
-  // Next step (Confirm screen)
-  function nextStep() {
-    const asset = document.getElementById("sendAsset").value;
-    const amount = document.getElementById("sendAmount").value;
-    const dest = document.getElementById("sendDest").value;
-    const memo = document.getElementById("sendMemo").value;
-
-    if (!amount || !dest) {
-      alert("Please fill in all required fields.");
-      return;
+  function showStep(step) {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById("step" + i).style.display = "none";
     }
+    document.getElementById("step" + step).style.display = "block";
 
-    // Push values to confirm step
-    document.getElementById("confirmAsset").textContent = asset;
-    document.getElementById("confirmAmount").textContent = amount;
-    document.getElementById("confirmDest").textContent = dest;
-    document.getElementById("confirmMemo").textContent = memo || "—";
-
-    document.getElementById("step1").style.display = "none";
-    document.getElementById("step2").style.display = "block";
+    if (step === 4) {
+      document.getElementById("confirmAsset").textContent = document.getElementById("sendAsset").value;
+      document.getElementById("confirmAmount").textContent = document.getElementById("sendAmount").value;
+      document.getElementById("confirmDest").textContent = document.getElementById("sendDest").value;
+      document.getElementById("confirmMemo").textContent = document.getElementById("sendMemo").value || "—";
+    }
   }
 
-  // Back to form
-  function backStep() {
-    document.getElementById("step1").style.display = "block";
-    document.getElementById("step2").style.display = "none";
+  function nextStep(step) {
+    showStep(step);
   }
 
-  // Send Transaction
+  function backStep(step) {
+    showStep(step);
+  }
+
+  // Send transaction (same code as hore)
   async function sendTransaction() {
     const asset = document.getElementById("sendAsset").value;
     const amount = document.getElementById("sendAmount").value;
@@ -2991,16 +3001,10 @@ style="margin-top:10px;">
         .build();
 
       transaction.sign(currentKeypair);
-
       const result = await server.submitTransaction(transaction);
-      alert("✅ Transaction successful!\nHash: " + result.hash);
 
-      // Reset form
-      document.getElementById("sendAmount").value = "";
-      document.getElementById("sendDest").value = "";
-      document.getElementById("sendMemo").value = "";
+      alert("✅ Success! Hash: " + result.hash);
       document.getElementById("sendWizard").style.display = "none";
-
       await updateBalanceDisplay();
 
     } catch (err) {
@@ -3012,6 +3016,6 @@ style="margin-top:10px;">
     }
   }
 </script>
-  </script>
+</script>
 </body>
 </html>
