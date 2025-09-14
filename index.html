@@ -877,7 +877,7 @@
     </div>
 
     <!-- LOGGED IN VIEW -->
-    <div id="loggedInView" class="hidden">
+    <div id="loggedInView" style="display:none;">
       <!-- Wallet Container with New Design -->
       <div class="wallet-container">
         <!-- Total Assets -->
@@ -2223,8 +2223,8 @@
           await loadWallet();
           
           showSuccess('Wallet imported successfully!');
-          document.getElementById('authSection').classList.add('hidden');
-          document.getElementById('loggedInView').classList.remove('hidden');
+          document.getElementById('authSection').style.display = 'none';
+          document.getElementById('loggedInView').style.display = 'block';
           
         } catch (error) {
           console.error('Import error:', error);
