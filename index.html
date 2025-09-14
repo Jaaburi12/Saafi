@@ -389,8 +389,6 @@
   .asset-box img{ width:24px; height:24px; border-radius:50%; }
   .asset-box .asset-name{ font-weight:600; }
   .asset-box .asset-issuer{ font-size:.8rem; color:var(--muted); }
-  .swap-icon{ font-size:1.5rem; background:#fff; border-radius:50%; padding:5px; border:1px solid var(--line); cursor:pointer; transition:all 0.3s ease; }
-  .swap-icon:hover{ background:var(--brand); color:#fff; transform:rotate(180deg); }
   .trade-tabs{ display:flex; border-bottom:1px solid var(--line); background:#f8f9fa; }
   .trade-tabs .tab{ 
     flex:1; padding:12px; text-align:center; cursor:pointer; font-weight:600; 
@@ -751,10 +749,6 @@
     color: white;
   }
   
-  .action-button.swap {
-    background: #0052cc;
-    color: white;
-  }
   
   .action-button.trustline {
     background: #6c757d;
@@ -978,11 +972,6 @@
           </div>
         </div>
         
-        <div class="action-buttons">
-          <div class="action-button swap" id="btnSwap">
-            <div class="action-icon">⇄</div>
-            <div class="action-text">Swap</div>
-          </div>
           <div class="action-button trustline" id="addTrustlineBtn">
             <div class="action-icon">+</div>
             <div class="action-text">Add Trustline</div>
@@ -2895,34 +2884,7 @@
       }
     }
 
-    // Swap button logic
-    document.getElementById('btnSwap').addEventListener('click', function() {
-      openTradeModal('buy');
-      (async () => {
-        try {
-          const ob = await fetchLaamPrice();
-          if (ob && ob.ask) {
-            document.getElementById('modalPrice').value = parseFloat(ob.ask).toFixed(7);
-            calculateTotal();
-          }
-        } catch (e) {
-          console.warn('Could not prefill price for swap:', e);
-        }
-      })();
-    });
 
-    // Allow swapping direction by clicking the swap icon
-    const swapIcon = document.getElementById('swapAssets');
-    if (swapIcon) {
-      swapIcon.addEventListener('click', () => {
-        const assetBoxes = document.querySelectorAll('.trade-asset-selector .asset-box');
-        if (assetBoxes.length === 2) {
-          const left = assetBoxes[0].innerHTML;
-          assetBoxes[0].innerHTML = assetBoxes[1].innerHTML;
-          assetBoxes[1].innerHTML = left;
-        }
-      });
-    }
 
   function openSendWizard() {
     document.getElementById("sendWizard").style.display = "block";
