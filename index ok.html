@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laam wallet - Send & Receive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .header p {
+            color: #ccc;
+            font-size: 16px;
+        }
+        
+        .wallet-balance {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .balance-label {
+            color: #ccc;
+            font-size: 16px;
+        }
+        
+        .assets-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .asset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .asset-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .asset-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .asset-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        
+        .asset-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .asset-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .asset-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .asset-price {
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .asset-right {
+            text-align: right;
+        }
+        
+        .asset-balance {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .asset-balance-sub {
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .price-change {
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .positive {
+            color: #4cd964;
+        }
+        
+        .negative {
+            color: #ff3b30;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .action-btn i {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .send-btn {
+            color: #ff9500;
+        }
+        
+        .receive-btn {
+            color: #4cd964;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #1e1e1e;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .modal-header p {
+            color: #ccc;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .token-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .token-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .token-details h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .token-details p {
+            color: #ccc;
+        }
+        
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .modal-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .modal-btn i {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .modal-btn.send {
+            color: #ff9500;
+        }
+        
+        .modal-btn.receive {
+            color: #4cd964;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Wizard Styles */
+        .wizard {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1e1e1e;
+            border-radius: 20px 20px 0 0;
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            max-height: 90vh;
+        }
+        
+        .wizard-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .wizard-close {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        
+        .wizard-steps {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .wizard-btn {
+            padding: 12px 25px;
+            border-radius: 12px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .btn-next {
+            background: #007bff;
+            color: #fff;
+        }
+        
+        .btn-confirm {
+            background: #4cd964;
+            color: #fff;
+        }
+        
+        .wizard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .confirmation-details {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .confirmation-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .confirmation-label {
+            color: #ccc;
+        }
+        
+        .receive-content {
+            text-align: center;
+        }
+        
+        .qrcode-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        #qrcode {
+            padding: 15px;
+            background: #fff;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .public-address {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            word-break: break-all;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+        
+        .copy-btn {
+            padding: 12px 25px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .asset-item {
+                padding: 12px;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-wallet"></i> Token Wallet</h1>
+            <p>Manage your XLM, LAAM, and USDC tokens</p>
+        </div>
+        
+        <div class="wallet-balance">
+            <div class="balance-amount">$1,243.56</div>
+            <div class="balance-label">Total Balance</div>
+        </div>
+        
+        <div class="assets-section">
+            <div class="section-title">
+                <span>My Assets</span>
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            
+            <!-- XLM -->
+            <div class="asset-item" data-token="XLM">
+                <div class="asset-left">
+                    <div class="asset-icon">
+                        <img src="https://res.coinpaper.com/coinpaper/stellar_xlm_logo_07021d63c0.png" alt="XLM">
+                    </div>
+                    <div class="asset-details">
+                        <div class="asset-name">XLM</div>
+                        <div class="asset-price">
+                            <span id="xlmUsd"></span>
+                            <small class="per">$<span id="xlmPrice">0.409</span>
+                            <span id="xlmChange" class="price-change positive">+2.5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="asset-right">
+                    <div class="asset-balance"><span id="xlmBal">125.50</span></div>
+                    <div class="asset-balance-sub">$<span id="xlmBalUsd">51.32</span></div>
+                </div>
+            </div>
+
+            <!-- LAAM -->
+            <div class="asset-item" data-token="LAAM">
+                <div class="asset-left">
+                    <div class="asset-icon">
+                        <img src="https://i.ibb.co/r28SP1bN/20250802-225108.png" alt="LAAM">
+                    </div>
+                    <div class="asset-details">
+                        <div class="asset-name">Laam</div>
+                        <div class="asset-price">
+                            <span id="laamUsd"></span>
+                            <small class="per">$<span id="laamPrice">0.056</span>
+                            <span id="laamChange" class="price-change negative">-1.2%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="asset-right">
+                    <div class="asset-balance"><span id="laamBal">850</span></div>
+                    <div class="asset-balance-sub">$<span id="laamBalUsd">47.60</span></div>
+                </div>
+            </div>
+
+            <!-- USDC -->
+            <div class="asset-item" data-token="USDC">
+                <div class="asset-left">
+                    <div class="asset-icon">
+                        <img src="https://i.ibb.co/r2qNFs22/images-2.png" alt="USDC">
+                    </div>
+                    <div class="asset-details">
+                        <div class="asset-name">USDC</div>
+                        <div class="asset-price">
+                            <span id="usdcUsd"></span>
+                            <small class="per"><span id="usdcPrice">1.00</span>
+                            <span id="usdcChange" class="price-change">0.00%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="asset-right">
+                    <div class="asset-balance"><span id="usdcBal">1144.64</span></div>
+                    <div class="asset-balance-sub">$<span id="usdcBalUsd">1144.64</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <div class="action-btn send-btn" id="btnSend">
+                <i class="fas fa-paper-plane"></i>
+                <span>Send</span>
+            </div>
+            <div class="action-btn receive-btn" id="btnReceive">
+                <i class="fas fa-qrcode"></i>
+                <span>Receive</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Token Action Modal -->
+    <div class="modal" id="tokenModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTokenName">XLM</h2>
+                <p>Select an action</p>
+            </div>
+            <div class="modal-body">
+                <div class="token-info">
+                    <div class="token-icon">
+                        <img id="modalTokenIcon" src="https://res.coinpaper.com/coinpaper/stellar_xlm_logo_07021d63c0.png" alt="Token">
+                    </div>
+                    <div class="token-details">
+                        <h3 id="modalTokenBalance">0</h3>
+                        <p id="modalTokenValue">$0.00</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn send" onclick="openSendWizard()">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Send</span>
+                    </button>
+                    <button class="modal-btn receive" onclick="openReceiveModal()">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Receive</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="close-modal" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    
+    <!-- Send Wizard -->
+    <div class="wizard" id="sendWizard">
+        <div class="wizard-header">
+            <div class="wizard-close" onclick="closeWizard()">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h2>Send Token</h2>
+        </div>
+        <div class="wizard-steps">
+            <div class="step active" id="step1">
+                <div class="form-group">
+                    <label for="sendAsset">Select Token</label>
+                    <input type="text" id="sendAsset" value="XLM" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="sendAmount">Amount</label>
+                    <input type="number" id="sendAmount" placeholder="Enter amount">
+                </div>
+            </div>
+            <div class="step" id="step2">
+                <div class="form-group">
+                    <label for="sendDest">Destination Address</label>
+                    <input type="text" id="sendDest" placeholder="Enter recipient address">
+                </div>
+            </div>
+            <div class="step" id="step3">
+                <div class="form-group">
+                    <label for="sendMemo">Memo (Optional)</label>
+                    <input type="text" id="sendMemo" placeholder="Enter memo">
+                </div>
+            </div>
+            <div class="step" id="step4">
+                <h3>Confirm Transaction</h3>
+                <div class="confirmation-details">
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Asset:</span>
+                        <span id="confirmAsset">XLM</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Amount:</span>
+                        <span id="confirmAmount">0</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Destination:</span>
+                        <span id="confirmDest">...</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Memo:</span>
+                        <span id="confirmMemo">—</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Network Fee:</span>
+                        <span>0.0001 XLM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="wizard-nav">
+            <button class="wizard-btn btn-back" onclick="backStep()">Back</button>
+            <button class="wizard-btn btn-next" onclick="nextStep()">Next</button>
+        </div>
+    </div>
+    
+    <!-- Receive Modal -->
+    <div class="wizard" id="receiveWizard">
+        <div class="wizard-header">
+            <div class="wizard-close" onclick="closeReceiveWizard()">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h2>Receive Token</h2>
+        </div>
+        <div class="wizard-steps">
+            <div class="step active">
+                <div class="receive-content">
+                    <div class="form-group">
+                        <label for="receiveAsset">Select Token to Receive</label>
+                        <input type="text" id="receiveAsset" value="XLM" readonly>
+                    </div>
+                    <p>Share this address to receive funds</p>
+                    <div class="qrcode-container">
+                        <div id="qrcode"></div>
+                    </div>
+                    <div class="public-address" id="publicAddress">
+                        GABCD1234EFGH5678IJKL9012MNOP3456QRST7890UVWX
+                    </div>
+                    <button class="copy-btn" onclick="copyAddress()">
+                        <i class="fas fa-copy"></i> Copy Address
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay -->
+    <div class="wizard-overlay" id="wizardOverlay" onclick="closeWizard()"></div>
+
+    <script>
+        // Token data
+        const tokens = {
+            XLM: {
+                name: "XLM",
+                icon: "https://res.coinpaper.com/coinpaper/stellar_xlm_logo_07021d63c0.png",
+                balance: "125.50",
+                value: "$51.32",
+                price: "$0.409"
+            },
+            LAAM: {
+                name: "LAAM",
+                icon: "https://i.ibb.co/r28SP1bN/20250802-225108.png",
+                balance: "850",
+                value: "$47.60",
+                price: "$0.056"
+            },
+            USDC: {
+                name: "USDC",
+                icon: "https://i.ibb.co/r2qNFs22/images-2.png",
+                balance: "1144.64",
+                value: "$1144.64",
+                price: "$1.00"
+            }
+        };
+        
+        // Get modal element
+        const modal = document.getElementById('tokenModal');
+        let selectedToken = '';
+        let currentStep = 1;
+        
+        // Add click event to all asset items
+        document.querySelectorAll('.asset-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const tokenName = this.getAttribute('data-token');
+                openTokenModal(tokenName);
+            });
+        });
+        
+        // Function to open token modal
+        function openTokenModal(tokenName) {
+            selectedToken = tokenName;
+            const token = tokens[tokenName];
+            if (token) {
+                document.getElementById('modalTokenName').textContent = token.name;
+                document.getElementById('modalTokenIcon').src = token.icon;
+                document.getElementById('modalTokenBalance').textContent = token.balance + " " + token.name;
+                document.getElementById('modalTokenValue').textContent = token.value + " • " + token.price;
+                modal.style.display = 'flex';
+            }
+        }
+        
+        // Function to close modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        
+        // Open send wizard from main button
+        document.getElementById("btnSend").onclick = function(){
+            openSendWizard();
+        }
+        
+        // Open receive from main button
+        document.getElementById("btnReceive").onclick = function(){
+            openReceiveModal();
+        }
+        
+        // Open send wizard
+        function openSendWizard() {
+            closeModal();
+            document.getElementById("sendWizard").style.display = "flex";
+            document.getElementById("wizardOverlay").style.display = "block";
+            document.getElementById("sendAsset").value = selectedToken;
+            showStep(1);
+        }
+        
+        // Open receive modal
+        function openReceiveModal() {
+            closeModal();
+            document.getElementById("receiveWizard").style.display = "flex";
+            document.getElementById("wizardOverlay").style.display = "block";
+            document.getElementById("receiveAsset").value = selectedToken;
+            
+            // Generate QR code
+            document.getElementById("qrcode").innerHTML = "";
+            const publicKey = currentKeypair ? currentKeypair.publicKey() : "GABCD1234EFGH5678IJKL9012MNOP3456QRST7890UVWX";
+            document.getElementById("publicAddress").textContent = publicKey;
+            
+            new QRCode(document.getElementById("qrcode"), {
+                text: publicKey,
+                width: 180,
+                height: 180
+            });
+        }
+        
+        // Close receive wizard
+        function closeReceiveWizard() {
+            document.getElementById("receiveWizard").style.display = "none";
+            document.getElementById("wizardOverlay").style.display = "none";
+        }
+        
+        // Close wizard
+        function closeWizard() {
+            document.getElementById("sendWizard").style.display = "none";
+            document.getElementById("receiveWizard").style.display = "none";
+            document.getElementById("wizardOverlay").style.display = "none";
+        }
+        
+        // Show step in wizard
+        function showStep(step) {
+            currentStep = step;
+            for(let i = 1; i <= 4; i++) {
+                document.getElementById("step"+i).style.display = "none";
+            }
+            document.getElementById("step"+step).style.display = "block";
+            
+            // Update navigation buttons
+            const backBtn = document.querySelector('.btn-back');
+            const nextBtn = document.querySelector('.btn-next');
+            
+            if(step === 1) {
+                backBtn.textContent = "Cancel";
+            } else {
+                backBtn.textContent = "Back";
+            }
+            
+            if(step === 4) {
+                nextBtn.textContent = "Confirm";
+                nextBtn.classList.add('btn-confirm');
+                nextBtn.classList.remove('btn-next');
+                
+                // Set confirmation details
+                document.getElementById("confirmAsset").textContent = document.getElementById("sendAsset").value;
+                document.getElementById("confirmAmount").textContent = document.getElementById("sendAmount").value;
+                document.getElementById("confirmDest").textContent = document.getElementById("sendDest").value;
+                document.getElementById("confirmMemo").textContent = document.getElementById("sendMemo").value || "—";
+            } else {
+                nextBtn.textContent = "Next";
+                nextBtn.classList.remove('btn-confirm');
+                nextBtn.classList.add('btn-next');
+            }
+        }
+        
+        // Next step
+        function nextStep() {
+            if(currentStep === 4) {
+                sendTransaction();
+                return;
+            }
+            showStep(currentStep + 1);
+        }
+        
+        // Back step
+        function backStep() {
+            if(currentStep === 1) {
+                closeWizard();
+            } else {
+                showStep(currentStep - 1);
+            }
+        }
+        
+        // Send transaction
+        async function sendTransaction() {
+            const asset = document.getElementById("sendAsset").value;
+            const amount = document.getElementById("sendAmount").value;
+            const destination = document.getElementById("sendDest").value;
+            const memo = document.getElementById("sendMemo").value;
+            
+            // Simulate transaction
+            console.log("Sending transaction:", { asset, amount, destination, memo });
+            
+            // Show success message (in a real app, you would handle the actual transaction)
+            alert(`Successfully sent ${amount} ${asset} to ${destination}`);
+            closeWizard();
+        }
+        
+        // Copy address
+        function copyAddress() {
+            const address = document.getElementById("publicAddress").textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                alert("Address copied to clipboard!");
+            });
+        }
+        
+        // Mock keypair for demonstration
+        const currentKeypair = {
+            publicKey: () => "GABCD1234EFGH5678IJKL9012MNOP3456QRST7890UVWX"
+        };
+    </script>
+</body>
+</html>
+   
