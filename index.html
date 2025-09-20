@@ -67,7 +67,51 @@
             color: #ccc;
             font-size: 16px;
         }
+
+       .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
         
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .action-btn i {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .send-btn {
+            color: #ff9500;
+        }
+        
+        .receive-btn {
+            color: #4cd964;
+        }
+
+        .add trustline-btn {
+            color: #4cd964;
+        }
+
+        
+        .lock-btn {
+            color: #ff9500
+                
         .assets-section {
             margin-bottom: 25px;
         }
@@ -162,41 +206,6 @@
             color: #ff3b30;
         }
         
-        .actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        .action-btn i {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        
-        .send-btn {
-            color: #ff9500;
-        }
-        
-        .receive-btn {
-            color: #4cd964;
-        }
         
         /* Modal Styles */
         .modal {
@@ -515,6 +524,23 @@
             <div class="balance-label">Total Balance</div>
         </div>
         
+        <div class="actions">
+            <div class="action-btn send-btn" id="btnSend">
+                <i class="fas fa-paper-plane"></i>
+                <span>Send</span>
+            </div>
+            <div class="action-btn receive-btn" id="btnReceive">
+                <i class="fas fa-qrcode"></i>
+                <span>Receive</span>
+            </div>
+            <div class="actions">
+            <div class="action-btn addtrustline-btn" id="btnaddtrustline">
+                <i class="fas fa-paper-plane"></i>
+                <span>add trustline</span>
+            </div>
+        </div>
+    </div>
+    
         <div class="assets-section">
             <div class="section-title">
                 <span>My Assets</span>
@@ -585,18 +611,7 @@
             </div>
         </div>
         
-        <div class="actions">
-            <div class="action-btn send-btn" id="btnSend">
-                <i class="fas fa-paper-plane"></i>
-                <span>Send</span>
-            </div>
-            <div class="action-btn receive-btn" id="btnReceive">
-                <i class="fas fa-qrcode"></i>
-                <span>Receive</span>
-            </div>
-        </div>
-    </div>
-    
+        
     <!-- Token Action Modal -->
     <div class="modal" id="tokenModal">
         <div class="modal-content">
